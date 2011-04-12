@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    JinArchiverビルドファイル
+
+    Apache Ant [ http://ant.apache.org/ ] 1.7 以降用に記述されています。
+
+    ※各種IDEのビルドファイルと衝突させないため、
+    意図して一般的でないビルドファイル名にしてあります。
+    ant の -buildfile オプションを使ってください。
+
+    Copyright(c) 2009 olyutorskii
+    $Id: antbuild.xml 879 2009-10-25 15:42:50Z olyutorskii $
+-->
+
+<project name="JinArchiver" default="compile">
+
+    <tstamp />
+
+    <description>
+        JinArchive build-file
+    </description>
+
+
+    <property name="title"    value="JinArchiver"                        />
+    <property name="package"  value="jp.sourceforge.jindolf.archiver"         />
+    <property name="jarbase"  value="jinarchiver"                        />
+    <property name="vendor"   value="olyutorskii"                    />
+    <property name="doctitle" value="${title} document"              />
+
+    <property name="entrymain" value="${package}.JinArchiver" />
+
+
+    <property name="src"         location="src/"                   />
+    <property name="testsrc"     location="test/"                  />
+    <property name="build"       location="build/"                 />
+    <property name="classes"     location="${build}/classes/"      />
+    <property name="testclasses" location="${build}/test/classes/" />
+    <property name="dist"        location="dist/"                  />
+    <property name="javadoc"     location="${dist}/javadoc/"       />
+    <property name="scripts"     location="scripts/"               />
+    <property name="depinfo"     location="depend.properties"      />
+
+
+    <property name="build.compiler"          value="modern" />
+    <property name="build.compiler.emacs"    value="true"   />
+    <property name="build.compiler.pedantic" value="true"   />
+
+    <property name="docscope" value="protected" />
+    <property
+        name="jdkhref"
+        value="http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/"
+    />
+<!--
+        value="http://java.sun.com/j2se/1.5.0/docs/api/"
+        value="http://java.sun.com/javase/6/docs/api/"
+        value="http://java.sun.com/javase/6/docs/ja/api/"
+-->
+
+
+    <macrodef name="propertycopy">
+        <attribute name="name" />
+        <attribute name="from" />
+        <sequential>
+            <property name="@{name}" value="${@{from}}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="defunset">
+        <attribute name="name" />
+        <sequential>
+            <condition property="@{name}" value="">
+                <not>
+                    <isset property="@{name}" />
+                </not>
+            </condition>
+        </sequential>
+    </macrodef>
+
+    <property environment="myenv" />
+    <macrodef name="envprop">
+        <attribute name="name" />
+        <attribute name="envname" />
+        <sequential>
+            <condition property="@{name}" value="${myenv.@{envname}}">
+                <and>
+                    <not>
+                        <isset property="@{name}" />
+                    </not>
+                    <isset property="myenv.@{envname}" />
+                </and>
+            </condition>
+            <defunset name="@{name}" />
+        </sequential>
+    </macrodef>
+
+    <envprop name="junit.home"      envname="JUNIT_HOME"      />
+    <envprop name="findbugs.home"   envname="FINDBUGS_HOME"   />
+    <envprop name="pmd.home"        envname="PMD_HOME"        />
+    <envprop name="checkstyle.home" envname="CHECKSTYLE_HOME" />
+
+    <property name="findbugs.filter"   location="${scripts}/fbexfilter.xml" />
+    <property name="pmd.rules"         location="${scripts}/pmdrules.xml"   />
+    <property name="checkstyle.checks" location="${scripts}/checks.xml"     />
+
+    <path id="junit.path">
+        <fileset dir="${junit.home}" includes="*.jar, lib/*.jar" />
+    </path>
+
+    <path id="findbugs.path">
+        <fileset dir="${findbugs.home}" includes="*.jar, lib/*.jar" />
+    </path>
+
+    <path id="pmd.path">
+        <fileset dir="${pmd.home}" includes="*.jar, lib/*.jar" />
+    </path>
+
+    <path id="checkstyle.path">
+        <fileset dir="${checkstyle.home}" includes="*.jar, lib/*.jar" />
+    </path>
+
+
+    <propertyset id="pkgversions" dynamic="true">
+        <propertyref regex="^pkg\-version\..*$" />
+    </propertyset>
+
+
+    <fileset id="xmlresources" dir="${src}">
+        <include name="**/*.xsd" />
+        <include name="**/*.xml" />
+    </fileset>
+
+    <fileset id="garbagefiles" dir="${basedir}" defaultexcludes="off">
+        <include name="**/.DS_Store" />
+        <include name="**/Thumbs.db" />
+        <include name="**/core" />
+    </fileset>
+    <defaultexcludes add="**/.DS_Store" />
+    <defaultexcludes add="**/Thumbs.db" />
+    <defaultexcludes add="**/core" />
+
+
+    <target name="init" description="initialize">
+        <echo message="initializing..." />
+    </target>
+
+    <target description="validate XML-resources"
+        name="xmlvalidate" depends="init"
+    >
+        <echo message="validating XML resources..." />
+
+        <xmlvalidate warn="on">
+            <attribute name="http://xml.org/sax/features/validation" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/schema-full-checking" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/dynamic" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/warn-on-undeclared-elemdef" value="true" />
+            <fileset refid="xmlresources" />
+        </xmlvalidate>
+
+        <schemavalidate warn="on" fullchecking="on" >
+            <schema
+                namespace="http://www.w3.org/2001/XMLSchema"
+                url="http://www.w3.org/2001/XMLSchema.xsd"
+            />
+            <attribute name="http://xml.org/sax/features/validation" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/schema-full-checking" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/dynamic" value="true" />
+            <attribute name="http://apache.org/xml/features/validation/warn-on-undeclared-elemdef" value="true" />
+            <fileset refid="xmlresources" />
+        </schemavalidate>
+    </target>
+
+    <target description="compile java-files"
+        name="compile" depends="init"
+    >
+        <echo message="compiling Java sources..." />
+
+        <mkdir dir="${classes}" />
+
+        <javac
+            destdir="${classes}"
+            encoding="UTF-8"
+            target="1.5" debug="on"
+            deprecation="on"
+        >
+            <compilerarg compiler="modern" line="-source 1.5" />
+            <compilerarg compiler="modern" line="-Xlint" />
+            <src path="${src}" />
+            <include name="**/*.java" />
+        </javac>
+
+        <copy todir="${classes}">
+            <fileset dir="${src}">
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target description="compile tests pg"
+        name="testcompile" depends="compile"
+    >
+        <echo message="compiling Junit tests..." />
+
+        <mkdir dir="${testclasses}" />
+
+        <javac
+            destdir="${testclasses}"
+            encoding="UTF-8"
+            target="1.5" debug="on"
+            deprecation="on"
+        >
+            <compilerarg compiler="modern" line="-source 1.5" />
+            <compilerarg compiler="modern" line="-Xlint" />
+            <classpath>
+                <path path="${classes}" />
+                <path refid="junit.path" />
+            </classpath>
+            <src path="${testsrc}" />
+            <include name="**/*.java" />
+        </javac>
+
+        <copy todir="${testclasses}">
+            <fileset dir="${testsrc}">
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- JUnit [ http://www.junit.org/ ] -->
+    <target description="JUnit test"
+        name="test" depends="testcompile"
+    >
+        <echo message="JUnit testing..." />
+
+        <junit
+            printsummary="on"
+            fork="on" forkmode="once"
+            tempdir="${java.io.tmpdir}"
+        >
+            <classpath>
+                <path path="${classes}" />
+                <path path="${testclasses}" />
+                <path refid="junit.path" />
+            </classpath>
+
+            <assertions enableSystemAssertions="true">
+                <enable />
+            </assertions>
+
+            <batchtest>
+                <fileset dir="${testsrc}">
+                    <include name="**/*Test.java" />
+                    <include name="**/Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- FindBugs [ http://findbugs.sourceforge.net/ ] -->
+    <target description="bytecode analysis"
+        name="findbugs" depends="compile"
+    >
+        <echo message="code analysis with FindBugs..." />
+
+        <taskdef
+            name="findbugs"
+            classpathref="findbugs.path"
+            classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+        />
+
+        <findbugs
+            home="${findbugs.home}"
+            output="emacs"
+            reportLevel="low"
+            effort="max"
+            excludeFilter="${findbugs.filter}"
+            jvmargs="-Xmx256m"
+        >
+            <sourcePath path="${src}" />
+            <class location="${classes}" />
+        </findbugs>
+    </target>
+
+    <!-- PMD [ http://pmd.sourceforge.net/ ] -->
+    <target description="sourcecode analysis"
+        name="pmd" depends="compile"
+    >
+        <echo message="code analysis with PMD..." />
+
+        <taskdef
+            name="pmd"
+            classpathref="pmd.path"
+            classname="net.sourceforge.pmd.ant.PMDTask"
+        />
+
+        <pmd
+            targetjdk="1.5" encoding="UTF-8"
+            rulesetfiles="${pmd.rules}"
+            shortFilenames="on"
+        >
+            <formatter type="csv" toConsole="true" />
+            <fileset dir="${src}">
+                <include name="**/*.java" />
+            </fileset>
+        </pmd>
+    </target>
+
+    <!-- Checkstyle [ http://checkstyle.sourceforge.net/ ] -->
+    <target description="check source-code..."
+        name="checkstyle" depends="compile"
+    >
+        <echo message="check code style..." />
+
+        <taskdef
+            classpathref="checkstyle.path"
+            resource="checkstyletask.properties"
+        />
+
+        <checkstyle config="${checkstyle.checks}" classpath="${classes}">
+            <fileset dir="${src}">
+                <include name="**/*.java" />
+            </fileset>
+        </checkstyle>
+    </target>
+
+    <target description="resolve depend package info"
+        name="resolvedependpkg" depends="init"
+    >
+        <tempfile
+            property="depversion.temp"
+            prefix="version"
+            suffix=".properties"
+            deleteonexit="on"
+            destdir="${java.io.tmpdir}"
+        />
+
+        <concat destfile="${depversion.temp}" fixlastline="on">
+            <fileset dir="${src}">
+                <include name="**/resources/version.properties" />
+            </fileset>
+        </concat>
+
+        <property file="${depversion.temp}" />
+        <fail unless="pkg-version.${package}">
+            There is no version definition about package [${package}].
+        </fail>
+        <propertycopy name="thisversion" from="pkg-version.${package}" />
+        <echo message="This package was defined as ${thisversion}" />
+
+        <echoproperties destfile="${depversion.temp}" failonerror="on">
+            <propertyset refid="pkgversions" />
+        </echoproperties>
+
+        <concat destfile="${depinfo}">
+            <filterchain>
+                <striplinecomments>
+                    <comment value="#" />
+                </striplinecomments>
+            </filterchain>
+
+            <header
+                trimleading="on" filtering="off"
+                file="${scripts}/depheader.properties"
+            />
+
+            <fileset file="${depversion.temp}" />
+
+            <footer
+                trimleading="on" filtering="off"
+                file="${scripts}/depfooter.properties"
+            />
+        </concat>
+
+        <delete file="${depversion.temp}" />
+    </target>
+
+    <target description="build jar-file"
+        name="jar" depends="sanitize, resolvedependpkg, compile"
+    >
+        <echo message="building JAR archive..." />
+
+        <property
+            name="jarname"
+            location="${dist}/${jarbase}-${thisversion}.jar"
+        />
+
+        <delete file="${jarname}" />
+        <mkdir dir="${dist}" />
+
+        <jar
+            basedir="${classes}"
+            destfile="${jarname}"
+            compress="on"
+            strict="fail"
+        >
+            <manifest>
+                <attribute
+                    name="Main-Class"
+                    value="${entrymain}"
+                />
+                <attribute
+                    name="Implementation-Title"
+                    value="${title}"
+                />
+                <attribute
+                    name="Implementation-Vendor"
+                    value="${vendor}"
+                />
+                <attribute
+                    name="Implementation-Version"
+                    value="${thisversion}"
+                />
+                <attribute
+                    name="Sealed"
+                    value="true"
+                />
+            </manifest>
+        </jar>
+    </target>
+
+    <target description="build javadoc-documents"
+        name="javadocs" depends="init"
+    >
+        <echo message="generating javadoc HTML pages..." />
+
+        <javadoc
+            doctitle="${doctitle}" windowtitle="${doctitle}"
+            destdir="${javadoc}"
+            source="1.5" encoding="UTF-8"
+            charset="UTF-8" docencoding="UTF-8"
+            access="${docscope}"
+            use="on"
+            failonerror="true"
+        >
+            <package name="${package}" />
+            <link href="${jdkhref}" />
+            <fileset dir="${src}">
+                <include name="**/*.java" />
+            </fileset>
+        </javadoc>
+    </target>
+
+    <target description="remove garbage files"
+        name="clean-garbage" depends="init"
+    >
+        <echo message="cleaning garbages..." />
+        <delete verbose="true">
+            <fileset refid="garbagefiles" />
+        </delete>
+    </target>
+
+    <target description="invoke main entry"
+        name="invokemain" depends="compile, testcompile"
+    >
+        <echo message="invoke main entry..." />
+
+        <fail unless="mainclass" />
+
+        <defunset name="linearg" />
+
+        <java classname="${mainclass}" fork="true">
+            <arg line="${linearg}" />
+            <classpath>
+                <pathelement path="${classes}" />
+                <pathelement path="${testclasses}" />
+            </classpath>
+            <assertions enableSystemAssertions="true">
+                <enable />
+            </assertions>
+        </java>
+    </target>
+
+    <target description="sanitize files"
+        name="sanitize" depends="clean-garbage"
+    >
+        <echo message="sanitize now..." />
+
+        <fixcrlf
+            srcDir="${src}" includes="**/*.java"
+            encoding="UTF-8" outputencoding="UTF-8"
+            tablength="4" tab="remove" javafiles="true"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${testsrc}" includes="**/*.java"
+            encoding="UTF-8" outputencoding="UTF-8"
+            tablength="4" tab="remove" javafiles="true"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${src}" includes="**/*.xml,**/*.xsd"
+            encoding="UTF-8" outputencoding="UTF-8"
+            tablength="8" tab="remove"
+            eol="lf"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${testsrc}" includes="**/*.xml,**/*.xsd"
+            encoding="UTF-8" outputencoding="UTF-8"
+            tablength="8" tab="remove"
+            eol="lf"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${scripts}" includes="**/*.xml,**/*.xsd"
+            encoding="UTF-8" outputencoding="UTF-8"
+            tablength="8" tab="remove"
+            eol="lf"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${src}" includes="**/*.properties"
+            encoding="ISO-8859-1" outputencoding="ISO-8859-1"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${testsrc}" includes="**/*.properties"
+            encoding="ISO-8859-1" outputencoding="ISO-8859-1"
+            eof="remove"
+        />
+
+        <fixcrlf
+            srcDir="${scripts}" includes="**/*.properties"
+            encoding="ISO-8859-1" outputencoding="ISO-8859-1"
+            eof="remove"
+        />
+
+        <fixcrlf
+            file="${depinfo}"
+            encoding="ISO-8859-1" outputencoding="ISO-8859-1"
+            eof="remove"
+        />
+
+        <chmod type="file" perm="a-x">
+            <fileset dir="${basedir}" includes="**/*" excludes="**/*.sh" />
+        </chmod>
+    </target>
+
+    <target description="clean-up"
+        name="clean" depends="clean-garbage"
+    >
+        <echo message="cleaning now..." />
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <delete dir="${javadoc}" />
+    </target>
+
+    <target description="All"
+        name="all" depends="xmlvalidate, test, jar, javadocs"
+    />
+
+    <target description="synonym for (compile)"
+        name="build" depends="compile"
+    />
+
+    <target description="synonym for (jar)"
+        name="deploy" depends="jar"
+    />
+
+    <target description="synonym for (javadocs)"
+        name="docs" depends="javadocs"
+    />
+
+    <target description="synonym for (all)"
+        name="main" depends="all"
+    />
+
+</project>
+
+<!-- EOF -->

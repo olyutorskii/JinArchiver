@@ -1,4 +1,3 @@
-$Id: License.txt 879 2009-10-25 15:42:50Z olyutorskii $
 [UTF-8 Japanese]
 
 The MIT License

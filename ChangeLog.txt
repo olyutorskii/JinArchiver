@@ -1,9 +1,12 @@
-$Id: ChangeLog.txt 879 2009-10-25 15:42:50Z olyutorskii $
 [UTF-8 Japanese]
 
 
 JinArchiver 変更履歴
 
+
+X.XXX.X
+    ・JinParser 1.407.2版に対応。
+    ・SCMをSubversionからMercurialに移行
 
 1.401.2 (2009-10-26)
     ・初回リリース。

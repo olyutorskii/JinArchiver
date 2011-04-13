@@ -2,7 +2,6 @@
  * talk dialog
  *
  * Copyright(c) 2008 olyutorskii
- * $Id: TalkData.java 877 2009-10-25 15:16:13Z olyutorskii $
  */
 
 package jp.sourceforge.jindolf.archiver;

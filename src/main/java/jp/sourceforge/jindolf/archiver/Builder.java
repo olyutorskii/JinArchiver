@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import jp.sourceforge.jindolf.parser.ContentBuilder;
+import jp.sourceforge.jindolf.parser.ContentBuilderSJ;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.DecodedContent;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
@@ -34,7 +35,7 @@ public final class Builder{
     public static DecodedContent contentFromStream(InputStream istream)
             throws IOException, DecodeException{
         StreamDecoder decoder = new SjisDecoder();
-        ContentBuilder builder = new ContentBuilder();
+        ContentBuilder builder = new ContentBuilderSJ();
         decoder.setDecodeHandler(builder);
 
         decoder.decode(istream);

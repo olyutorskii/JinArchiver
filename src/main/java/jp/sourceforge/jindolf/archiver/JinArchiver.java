@@ -11,11 +11,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import jp.sourceforge.jindolf.corelib.LandDef;
@@ -26,11 +28,32 @@ import jp.sourceforge.jindolf.parser.HtmlParseException;
  * メインエントリ。
  */
 public final class JinArchiver{
+
+    /** このClass。 */
+    private static final Class<?> SELF_KLASS;
+    /** このPackage。 */
+    private static final Package  SELF_PACKAGE;
+    /** タイトル。 */
+    private static final String TITLE;
+    /** バージョン。 */
+    private static final String VERSION;
     /** Generator. */
-    public static final String GENERATOR = "JinArchiver 1.401.2";
+    private static final String GENERATOR;
+
     private static final List<LandDef> LANDDEF_LIST;
 
+    /** バージョン定義リソース。 */
+    private static final String RES_VERDEF = "resources/version.properties";
+
     static{
+        SELF_KLASS   = JinArchiver.class;
+        SELF_PACKAGE = SELF_KLASS.getPackage();
+
+        Properties verProp = loadVersionDefinition(SELF_KLASS);
+        TITLE   = getPackageInfo(verProp, "pkg-title.",   "Unknown");
+        VERSION = getPackageInfo(verProp, "pkg-version.", "0");
+        GENERATOR = TITLE + " " + VERSION;
+
         DocumentBuilderFactory factory =
                 DocumentBuilderFactory.newInstance();
         try{
@@ -41,6 +64,83 @@ public final class JinArchiver{
         }catch(Exception e){
             throw new ExceptionInInitializerError(e);
         }
+    }
+
+    /**
+     * リソース上のパッケージ定義プロパティをロードする。
+     * MANIFEST.MFが参照できない実行環境での代替品。
+     * @param klass パッケージを構成する任意のクラス
+     * @return プロパティ
+     */
+    private static Properties loadVersionDefinition(Class klass){
+        Properties result = new Properties();
+
+        InputStream istream = klass.getResourceAsStream(RES_VERDEF);
+        try{
+            result.load(istream);
+        }catch(IOException e){
+            return result;
+        }finally{
+            try{
+                istream.close();
+            }catch(IOException e){
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * リソース上のプロパティから
+     * このクラスのパッケージのパッケージ情報を取得する。
+     * MANIFEST.MFが参照できない実行環境での代替品。
+     * @param prop プロパティ
+     * @param prefix 接頭辞
+     * @param defValue 見つからなかった場合のデフォルト値
+     * @return パッケージ情報
+     */
+    private static String getPackageInfo(Properties prop,
+                                          String prefix,
+                                          String defValue){
+        return getPackageInfo(prop, SELF_PACKAGE, prefix, defValue);
+    }
+
+    /**
+     * リソース上のプロパティからパッケージ情報を取得する。
+     * MANIFEST.MFが参照できない実行環境での代替品。
+     * @param prop プロパティ
+     * @param pkg 任意のパッケージ
+     * @param prefix 接頭辞
+     * @param defValue デフォルト値
+     * @return 見つからなかった場合のパッケージ情報
+     */
+    private static String getPackageInfo(Properties prop,
+                                          Package pkg,
+                                          String prefix,
+                                          String defValue){
+        String propName = prefix + pkg.getName();
+        String result = prop.getProperty(propName, defValue);
+        return result;
+    }
+
+    /**
+     * System.err.println()のWrapper。
+     * @param text 出力テキスト
+     */
+    private static void errprintln(CharSequence text){
+        System.err.println(text);
+        return;
+    }
+
+    /**
+     * プログラムの終了。
+     * @param code プロセスコード。
+     */
+    private static void exit(int code){
+        System.exit(code);
+        assert false;
+        return;
     }
 
     /**
@@ -59,7 +159,7 @@ public final class JinArchiver{
      * ヘルプメッセージ出力。
      */
     private static void helpMessage(){
-        System.err.println(
+        errprintln(
                 "\n" + GENERATOR + " 人狼BBS アーカイブ作成ツール\n\n"
                 +"-h, -help, -?\n\tヘルプメッセージ\n"
                 +"-land 国識別子\n"
@@ -72,9 +172,8 @@ public final class JinArchiver{
         for(LandDef landDef : LANDDEF_LIST){
             landList.append(landDef.getLandId()).append(' ');
         }
-        System.err.print("利用可能な国識別子は ");
-        System.err.println(landList);
-        System.err.println();
+        errprintln("利用可能な国識別子は " + landList + "\n");
+
         return;
     }
 
@@ -85,7 +184,7 @@ public final class JinArchiver{
     private static void parseOption(String[] args){
         if(args.length <= 0){
             helpMessage();
-            System.exit(0);
+            exit(0);
             return;
         }
 
@@ -98,14 +197,14 @@ public final class JinArchiver{
             String arg = args[pos];
 
             if( ! arg.startsWith("-") ){
-                System.err.println("不正なオプションです。 " + arg);
-                System.exit(1);
+                errprintln("不正なオプションです。 " + arg);
+                exit(1);
                 return;
             }
 
             if(arg.equals("-h") || arg.equals("-help") || arg.equals("-?")){
                 helpMessage();
-                System.exit(0);
+                exit(0);
                 return;
             }
 
@@ -116,9 +215,9 @@ public final class JinArchiver{
             }
 
             if(++pos >= args.length){
-                System.err.println(
+                errprintln(
                         "オプション " + arg + " に引数がありません。");
-                System.exit(1);
+                exit(1);
                 return;
             }
 
@@ -126,46 +225,46 @@ public final class JinArchiver{
             if(arg.equals("-land")){
                 landDef = getLandDef(val);
                 if(landDef == null){
-                    System.err.println("不正な国識別子です。 " + val);
-                    System.exit(1);
+                    errprintln("不正な国識別子です。 " + val);
+                    exit(1);
                     return;
                 }
             }else if(arg.equals("-vid")){
                 vid = Integer.parseInt(val);
                 if(vid < 0){
-                    System.err.println("不正な村番号です。 " + vid);
-                    System.exit(1);
+                    errprintln("不正な村番号です。 " + vid);
+                    exit(1);
                     return;
                 }
             }else if(arg.equals("-outdir")){
                 outdir = val;
                 stdout = false;
             }else{
-                System.err.println("不正なオプションです。 " + arg);
-                System.exit(1);
+                errprintln("不正なオプションです。 " + arg);
+                exit(1);
                 return;
             }
         }
 
         if(landDef == null){
-            System.err.println(
+            errprintln(
                     "-land オプションで国識別子を指定してください。");
-            System.exit(1);
+            exit(1);
             return;
         }
 
         if(vid < 0){
-            System.err.println(
+            errprintln(
                     "-vid オプションで村番号を指定してください。");
-            System.exit(1);
+            exit(1);
             return;
         }
 
         if(   (outdir == null && stdout == false)
            || (outdir != null && stdout == true)  ){
-            System.err.println(
+            errprintln(
                     "-outdir か -stdout のどちらか一方を指定してください。");
-            System.exit(1);
+            exit(1);
             return;
         }
 
@@ -184,8 +283,8 @@ public final class JinArchiver{
             throw e;
         }catch(Exception e){
             e.printStackTrace(System.err);
-            System.err.println("処理を続行できません。");
-            System.exit(1);
+            errprintln("処理を続行できません。");
+            exit(1);
             return;
         }
 
@@ -225,9 +324,9 @@ public final class JinArchiver{
             writer = new OutputStreamWriter(ostream, "UTF-8");
             writer = new BufferedWriter(writer, 4 * 1024);
         }catch(IOException e){
-            System.err.println(
+            errprintln(
                     "標準出力に書き込めません。");
-            System.exit(1);
+            exit(1);
             return null;
         }
         return writer;
@@ -245,21 +344,21 @@ public final class JinArchiver{
                                          int vid ){
             File outFile = new File(outdir);
             if( ! outFile.exists() ){
-                System.err.println(
+                errprintln(
                         outdir + " が存在しません。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
             if( ! outFile.isDirectory() ){
-                System.err.println(
+                errprintln(
                         outdir + " はディレクトリではありません。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
             if( ! outFile.canWrite() ){
-                System.err.println(
+                errprintln(
                         outdir + " に書き込めません。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
             String fname = MessageFormat.format(
@@ -269,15 +368,15 @@ public final class JinArchiver{
             try{
                 created = xmlFile.createNewFile();
             }catch(IOException e){
-                System.err.println(
+                errprintln(
                         xmlFile.getName() + " が作成できません。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
             if( ! created ){
-                System.err.println(
+                errprintln(
                         fname + " が既に" + outdir + "に存在します。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
             /* JRE 1.6 only
@@ -293,9 +392,9 @@ public final class JinArchiver{
                 writer = new OutputStreamWriter(ostream, "UTF-8");
                 writer = new BufferedWriter(writer, 4 * 1024);
             }catch(IOException e){
-                System.err.println(
+                errprintln(
                         xmlFile.getName() + " に書き込めません。");
-                System.exit(1);
+                exit(1);
                 return null;
             }
 
@@ -308,7 +407,7 @@ public final class JinArchiver{
      */
     public static void main(String[] args){
         parseOption(args);
-        System.exit(0);
+        exit(0);
         return;
     }
 

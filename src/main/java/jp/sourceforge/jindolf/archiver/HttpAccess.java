@@ -124,19 +124,42 @@ public final class HttpAccess{
         public String getURL(PeriodType type, int day){
             String base = this.landDef.getCgiURI().toASCIIString();
             base += "?vid=" + this.vid;
-            base += "&meslog=" + this.vid + "_";
-            switch(type){
-            case PROLOGUE:
-                base += "ready_0";
-                break;
-            case PROGRESS:
-                base += "progress_" + (day - 1);
-                break;
-            case EPILOGUE:
-                base += "party_" + (day - 1);
-                break;
-            default:
-                return null;
+
+            if(this.landDef.getLandId().equals("wolfg")){
+                base += "&meslog=";
+                String dnum = "000" + (day - 1);
+                dnum = dnum.substring(dnum.length() - 3);
+                switch(type){
+                case PROLOGUE:
+                    base += "000_ready";
+                    break;
+                case PROGRESS:
+                    base += dnum;
+                    base += "_progress";
+                    break;
+                case EPILOGUE:
+                    base += dnum;
+                    base += "_party";
+                    break;
+                default:
+                    assert false;
+                    return null;
+                }
+            }else{
+                base += "&meslog=" + this.vid + "_";
+                switch(type){
+                case PROLOGUE:
+                    base += "ready_0";
+                    break;
+                case PROGRESS:
+                    base += "progress_" + (day - 1);
+                    break;
+                case EPILOGUE:
+                    base += "party_" + (day - 1);
+                    break;
+                default:
+                    return null;
+                }
             }
 
             base += "&mes=all";

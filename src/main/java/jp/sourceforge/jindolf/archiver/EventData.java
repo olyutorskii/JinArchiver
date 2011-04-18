@@ -43,6 +43,10 @@ public class EventData extends TopicData{
         case WINHAMSTER:   tagName = "winHamster";   break;
         case PLAYERLIST:   tagName = "playerList";   break;
         case PANIC:        tagName = "panic";        break;
+        case EXECUTION:    tagName = "execution";    break;
+        case VANISH:       tagName = "vanish";       break;
+        case CHECKOUT:     tagName = "checkout";     break;
+        case SHORTMEMBER:  tagName = "shortMember";  break;
         case ASKENTRY:     tagName = "askEntry";     break;
         case ASKCOMMIT:    tagName = "askCommit";    break;
         case NOCOMMENT:    tagName = "noComment";    break;
@@ -50,6 +54,7 @@ public class EventData extends TopicData{
         case GAMEOVER:     tagName = "gameOver";     break;
         case GUARD:        tagName = "guard";        break;
         case JUDGE:        tagName = "judge";        break;
+        case COUNTING2:    tagName = "counting2";    break;
         case ASSAULT:      tagName = "assault";      break;
         default: throw new IllegalArgumentException();
         }
@@ -185,7 +190,21 @@ public class EventData extends TopicData{
     }
 
     /**
-     * COUNTING属性値をXML出力する。
+     * avatarId属性値をXML出力する。
+     * @param writer 出力先
+     * @throws IOException 出力エラー
+     */
+    public void dumpSingleAvatarAttr(Writer writer) throws IOException{
+        AvatarData avatarData = this.avatarList.get(0);
+
+        writer.append(' ');
+        XmlUtils.attrOut(writer, "avatarId", avatarData.getAvatarId());
+
+        return;
+    }
+
+    /**
+     * COUNTINGのvictim属性値をXML出力する。
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
@@ -200,16 +219,18 @@ public class EventData extends TopicData{
     }
 
     /**
-     * SUDDENDEATH属性値をXML出力する。
+     * EXECUTIONのvictim属性値をXML出力する。
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpSuddendeathAttr(Writer writer) throws IOException{
-        AvatarData avatarData = this.avatarList.get(0);
-
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "avatarId", avatarData.getAvatarId());
-
+    public void dumpExecutionAttr(Writer writer) throws IOException{
+        int totalAvatar = this.avatarList.size();
+        int totalVotes = this.intList.size();
+        if(totalAvatar != totalVotes){
+            AvatarData victim = this.avatarList.get(totalAvatar - 1);
+            writer.append(' ');
+            XmlUtils.attrOut(writer, "victim", victim.getAvatarId());
+        }
         return;
     }
 
@@ -360,6 +381,26 @@ public class EventData extends TopicData{
     }
 
     /**
+     * execution子要素をXML出力する。
+     * @param writer 出力先
+     * @throws IOException 出力エラー
+     */
+    public void dumpExecutionElem(Writer writer) throws IOException{
+        int total = this.intList.size();
+        for(int index = 0; index < total; index++){
+            AvatarData voteTo = this.avatarList.get(index);
+            int count = this.intList.get(index);
+            writer.append("<nominated");
+            writer.append(' ');
+            XmlUtils.attrOut(writer, "avatarId", voteTo.getAvatarId());
+            writer.append(' ');
+            XmlUtils.attrOut(writer, "count", "" + count);
+            writer.append(" />\n");
+        }
+        return;
+    }
+
+    /**
      * playerlist子要素をXML出力する。
      * @param writer 出力先
      * @throws IOException 出力エラー
@@ -476,8 +517,13 @@ public class EventData extends TopicData{
         case COUNTING:
             dumpCountingAttr(writer);
             break;
+        case EXECUTION:
+            dumpExecutionAttr(writer);
+            break;
         case SUDDENDEATH:
-            dumpSuddendeathAttr(writer);
+        case VANISH:
+        case CHECKOUT:
+            dumpSingleAvatarAttr(writer);
             break;
         case ASKENTRY:
             dumpAskEntryAttr(writer);
@@ -516,7 +562,11 @@ public class EventData extends TopicData{
             dumpSurvivorElem(writer);
             break;
         case COUNTING:
+        case COUNTING2:
             dumpCountingElem(writer);
+            break;
+        case EXECUTION:
+            dumpExecutionElem(writer);
             break;
         case PLAYERLIST:
             dumpPlayerlistElem(writer);

@@ -9,6 +9,7 @@ package jp.sourceforge.jindolf.archiver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import jp.sourceforge.jindolf.corelib.LandDef;
@@ -65,8 +66,9 @@ public final class HttpAccess{
                    IOException {
         URL url = getPeriodListURL(landDef, vid);
 
+        Charset charset = landDef.getEncoding();
         InputStream istream = url.openStream();
-        DecodedContent content = Builder.contentFromStream(istream);
+        DecodedContent content = Builder.contentFromStream(charset, istream);
         istream.close();
 
         HtmlParser parser = new HtmlParser();

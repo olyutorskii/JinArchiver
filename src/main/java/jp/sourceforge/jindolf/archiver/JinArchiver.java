@@ -38,7 +38,7 @@ public final class JinArchiver{
     /** バージョン。 */
     private static final String VERSION;
     /** Generator. */
-    private static final String GENERATOR;
+    public static final String GENERATOR;
 
     private static final List<LandDef> LANDDEF_LIST;
 

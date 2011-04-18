@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import jp.sourceforge.jindolf.parser.ContentBuilder;
 import jp.sourceforge.jindolf.parser.ContentBuilderSJ;
+import jp.sourceforge.jindolf.parser.ContentBuilderUCS2;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.DecodedContent;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
@@ -24,17 +26,25 @@ import jp.sourceforge.jindolf.parser.StreamDecoder;
  */
 public final class Builder{
 
-    /**
-     * 入力ストリームをShift_JISでデコードする。
-     * @param istream 入力
-     * @return デコード結果
-     * @throws IOException 入力エラー
-     * @throws DecodeException デコードエラー
-     */
-    public static DecodedContent contentFromStream(InputStream istream)
+    private static int BUF_SZ = 100 * 1024;
+
+    public static DecodedContent contentFromStream(Charset charset,
+                                                     InputStream istream)
             throws IOException, DecodeException{
-        StreamDecoder decoder = new SjisDecoder();
-        ContentBuilder builder = new ContentBuilderSJ();
+        StreamDecoder decoder;
+        ContentBuilder builder;
+
+        if(charset.name().equalsIgnoreCase("Shift_JIS")){
+            decoder = new SjisDecoder();
+            builder = new ContentBuilderSJ(BUF_SZ);
+        }else if(charset.name().equalsIgnoreCase("UTF-8")){
+            decoder = new StreamDecoder(charset.newDecoder());
+            builder = new ContentBuilderUCS2(BUF_SZ);
+        }else{
+            assert false;
+            return null;
+        }
+
         decoder.setDecodeHandler(builder);
 
         decoder.decode(istream);
@@ -61,6 +71,8 @@ public final class Builder{
 
         handler.initVillageData(villageData);
 
+        Charset charset = villageData.getLandDef().getEncoding();
+
         for(PeriodResource resource : villageData.getPeriodResourceList()){
             handler.initPeriodResource(resource);
             URL url;
@@ -74,7 +86,7 @@ public final class Builder{
                 long downTimeMs = conn.getDate();
                 resource.setDownTimeMs(downTimeMs);
             }
-            DecodedContent content = contentFromStream(istream);
+            DecodedContent content = contentFromStream(charset, istream);
             istream.close();
             parser.parseAutomatic(content);
         }

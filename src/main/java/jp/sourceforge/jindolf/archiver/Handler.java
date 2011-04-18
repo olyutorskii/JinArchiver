@@ -260,7 +260,7 @@ public class Handler extends HtmlAdapter{
      */
     @Override
     public void startTalk() throws HtmlParseException{
-        this.currentTalk = new TalkData(this.currentPeriod);
+        this.currentTalk = new TalkData();
         return;
     }
 

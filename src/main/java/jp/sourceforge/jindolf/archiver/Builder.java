@@ -26,8 +26,16 @@ import jp.sourceforge.jindolf.parser.StreamDecoder;
  */
 public final class Builder{
 
-    private static int BUF_SZ = 100 * 1024;
+    private static final int BUF_SZ = 100 * 1024;
 
+    /**
+     * 入力ストリームをデコードする。
+     * @param charset 文字コード指定
+     * @param istream 入力ストリーム
+     * @return デコード結果
+     * @throws IOException 入力エラー
+     * @throws DecodeException デコードエラー
+     */
     public static DecodedContent contentFromStream(Charset charset,
                                                      InputStream istream)
             throws IOException, DecodeException{

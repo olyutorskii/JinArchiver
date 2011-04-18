@@ -100,7 +100,6 @@ public class EventData extends TopicData{
         return;
     }
 
-    private final PeriodData periodData;
     private SysEventType eventType = null;
 
     private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
@@ -115,7 +114,6 @@ public class EventData extends TopicData{
      */
     public EventData(PeriodData periodData){
         super();
-        this.periodData = periodData;
         return;
     }
 
@@ -210,7 +208,7 @@ public class EventData extends TopicData{
      */
     public void dumpCountingAttr(Writer writer) throws IOException{
         int total = this.avatarList.size();
-        if(total % 2 == 1){
+        if(total % 2 != 0){
             AvatarData victim = this.avatarList.get(total - 1);
             writer.append(' ');
             XmlUtils.attrOut(writer, "victim", victim.getAvatarId());

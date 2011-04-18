@@ -29,11 +29,11 @@ import jp.sourceforge.jindolf.parser.DecodedContent;
 public final class XmlUtils{
 
     public static final String ORIG_DTD =
-            "http://jindolf.sourceforge.jp/xml/dtd/bbsArchive-091001.dtd";
+            "http://jindolf.sourceforge.jp/xml/dtd/bbsArchive-110419.dtd";
     public static final String ORIG_NS =
-            "http://jindolf.sourceforge.jp/xml/ns/401";
+            "http://jindolf.sourceforge.jp/xml/ns/501";
     public static final String ORIG_SCHEME =
-            "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-091001.xsd";
+            "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-110419.xsd";
     public static final String SCHEMA_NS =
             "http://www.w3.org/2001/XMLSchema-instance";
 
@@ -361,7 +361,7 @@ public final class XmlUtils{
         int hexVal;
         hexVal = errorInfo.getRawByte1st() & 0xff;
         if(errorInfo.has2nd()){
-            hexVal = hexVal << 8;
+            hexVal <<= 8;
             hexVal |= errorInfo.getRawByte2nd() & 0xff;
         }
 

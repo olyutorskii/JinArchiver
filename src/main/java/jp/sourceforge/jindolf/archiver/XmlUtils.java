@@ -29,11 +29,11 @@ import jp.sourceforge.jindolf.parser.DecodedContent;
 public final class XmlUtils{
 
     public static final String ORIG_DTD =
-            "http://jindolf.sourceforge.jp/xml/dtd/bbsArchive-110419.dtd";
+            "http://jindolf.sourceforge.jp/xml/dtd/bbsArchive-110420.dtd";
     public static final String ORIG_NS =
             "http://jindolf.sourceforge.jp/xml/ns/501";
     public static final String ORIG_SCHEME =
-            "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-110419.xsd";
+            "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-110420.xsd";
     public static final String SCHEMA_NS =
             "http://www.w3.org/2001/XMLSchema-instance";
 

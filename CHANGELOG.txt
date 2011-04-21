@@ -4,6 +4,9 @@
 JinArchiver 変更履歴
 
 
+1.502.2 (2011-04-21)
+    ・110421版スキーマに対応。
+
 1.501.2 (2011-04-20)
     ・G国に対応。vanish,checkout,shortMember,counting2,executionタグの追加。
     ・JinParser 1.407.2版に対応。

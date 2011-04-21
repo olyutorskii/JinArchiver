@@ -16,7 +16,7 @@
     <groupId>jp.sourceforge.jindolf</groupId>
     <artifactId>jinarchiver</artifactId>
 
-    <version>1.501.2</version>
+    <version>1.501.3-SNAPSHOT</version>
 
     <packaging>jar</packaging>
     <name>JinArchiver</name>
@@ -128,6 +128,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
                 <configuration>
                     <filesets>
                         <fileset>
@@ -145,6 +146,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>  <!-- for NetBeans IDE -->
                     <target>1.5</target>
@@ -159,6 +161,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -172,6 +175,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/main/assembly/descriptor.xml</descriptor>
@@ -182,6 +186,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -206,6 +211,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0</version>
                 <configuration>
                     <rules>
                         <requireMavenVersion>
@@ -216,6 +222,21 @@
                         </requireJavaVersion>
                     </rules>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                          <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
@@ -261,6 +282,7 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
@@ -276,6 +298,7 @@
                 <version>2.6</version>
                 <configuration>
                     <configLocation>${project.myrepoconf}/checks.xml</configLocation>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 

@@ -1,3 +1,10 @@
-syntax: glob
-nb-configuration.xml
-nbactions.xml
+syntax: regexp
+
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$
+\.conflict\~$
+^nb-configuration\.xml$
+^nbactions\.xml$
+^target$

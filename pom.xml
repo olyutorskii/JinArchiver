@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-    Maven2 POM definition file
+    Maven3 POM definition file
 -->
 
 <project
@@ -97,7 +97,7 @@
         <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
 
         <!-- Walkaround for Maven3&PMD-plugin bug -->
-        <targetJdk>${maven.compiler.source}</targetJdk>
+        <targetJdk>1.5</targetJdk>
 
     </properties>
 
@@ -232,6 +232,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1.2</version>
+                <configuration>
+                    <includePom>true</includePom>
+                    <archive>
+                        <manifestEntries>
+                            <Built-By>${project.organization.name}</Built-By>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

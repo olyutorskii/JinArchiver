@@ -95,6 +95,10 @@
             org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
         </project.transformer>
         <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
+
+        <!-- Walkaround for Maven3&PMD-plugin bug -->
+        <targetJdk>${maven.compiler.source}</targetJdk>
+
     </properties>
 
     <dependencyManagement/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-    Maven3 POM definition file
+    Maven2 POM definition file
 -->
 
 <project
@@ -26,7 +26,7 @@
 -->保存するためのツールです。<!--
  --></description>
 
-    <url>http://jindolf.sourceforge.jp/</url>
+    <url>http://sourceforge.jp/projects/jindolf/devel/</url>
     <inceptionYear>2009</inceptionYear>
 
     <organization>
@@ -91,13 +91,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <project.myrepoconf>${project.basedir}/src/main/config</project.myrepoconf>
+
         <project.transformer>
             org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
         </project.transformer>
         <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
 
         <!-- Walkaround for Maven3&PMD-plugin bug -->
-        <targetJdk>1.5</targetJdk>
+        <targetJdk>${maven.compiler.source}</targetJdk>
+
+        <!-- Walkaround for Maven3&checkstyle bug -->
+        <checkstyle.config.location>${project.myrepoconf}/checks.xml</checkstyle.config.location>
 
     </properties>
 
@@ -108,14 +112,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>[4,)</version>
+            <version>[4.8.2,)</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>jp.sourceforge.jindolf</groupId>
             <artifactId>jinparser</artifactId>
-            <version>1.407.2</version>
+            <version>1.407.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
@@ -266,10 +270,13 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
+                    <include>**/*.css</include>
+                    <include>**/*.html</include>
+                    <include>**/*.png</include>
                     <include>**/*.properties</include>
+                    <include>**/*.txt</include>
                     <include>**/*.xml</include>
                     <include>**/*.xsd</include>
-                    <include>**/*.txt</include>
                 </includes>
                 <excludes>
                     <exclude>**/version.properties</exclude>
@@ -280,18 +287,9 @@
 
     </build>
 
-
     <reporting>
-        <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <show>protected</show>
-                </configuration>
-            </plugin>
+        <plugins>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -306,10 +304,19 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <show>protected</show>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <configLocation>${project.myrepoconf}/checks.xml</configLocation>
+                    <configLocation>${checkstyle.config.location}</configLocation>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -359,6 +366,11 @@
             </plugin>
 
         </plugins>
+
     </reporting>
 
+    <profiles/>
+
 </project>
+
+<!-- EOF -->

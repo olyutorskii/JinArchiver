@@ -6,6 +6,7 @@
  * このファイルはソースコードを含まず、
  * パッケージコメントとパッケージ宣言のみが含まれます。
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 

@@ -1,6 +1,7 @@
 /*
  * information builder from input
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 

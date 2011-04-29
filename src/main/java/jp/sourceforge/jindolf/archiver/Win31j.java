@@ -17,8 +17,6 @@ import jp.sourceforge.jindolf.parser.DecodedContent;
 
 /**
  * windows-31jエンコーディング(機種依存文字)に関する諸々。
- *
- * TODO 携帯絵文字サポート
  */
 public final class Win31j{
 
@@ -29,14 +27,14 @@ public final class Win31j{
     public static final Charset CS_WIN31J = Charset.forName("windows-31j");
 
     private static final CharsetDecoder WIN31JDECODER;
-    private static final ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+    private static final ByteBuffer BYTEBUFFER = ByteBuffer.allocate(2);
 
     static{
         WIN31JDECODER = CS_WIN31J.newDecoder();
         WIN31JDECODER.onMalformedInput(CodingErrorAction.REPORT);
         WIN31JDECODER.onUnmappableCharacter(CodingErrorAction.REPORT);
         WIN31JDECODER.reset();
-        byteBuffer.clear();
+        BYTEBUFFER.clear();
     }
 
 
@@ -60,12 +58,12 @@ public final class Win31j{
         char replaced;
 
         WIN31JDECODER.reset();
-        byteBuffer.clear();
-        byteBuffer.put(b1).put(b2);
-        byteBuffer.flip();
+        BYTEBUFFER.clear();
+        BYTEBUFFER.put(b1).put(b2);
+        BYTEBUFFER.flip();
 
         try{
-            replaced = WIN31JDECODER.decode(byteBuffer).charAt(0);
+            replaced = WIN31JDECODER.decode(BYTEBUFFER).charAt(0);
         }catch(CharacterCodingException e){
             replaced = REP_CHAR;
         }

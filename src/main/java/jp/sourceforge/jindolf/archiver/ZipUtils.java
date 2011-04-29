@@ -32,6 +32,15 @@ import jp.sourceforge.jindolf.parser.HtmlParseException;
 public final class ZipUtils{
 
     /**
+     * 隠れコンストラクタ。
+     */
+    private ZipUtils(){
+        super();
+        return;
+    }
+
+
+    /**
      * ZIPファイルに格納された村一覧を抽出する。
      * 各日のロードはまだ行われない。
      * @param zipFile ZIPファイル
@@ -209,14 +218,6 @@ public final class ZipUtils{
             it.remove();
         }
 
-        return;
-    }
-
-    /**
-     * 隠れコンストラクタ。
-     */
-    private ZipUtils(){
-        super();
         return;
     }
 

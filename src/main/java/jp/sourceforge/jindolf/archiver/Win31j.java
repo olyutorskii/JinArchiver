@@ -39,6 +39,15 @@ public final class Win31j{
         byteBuffer.clear();
     }
 
+
+    /**
+     * 隠しコンストラクタ。
+     */
+    private Win31j(){
+        throw new Error();
+    }
+
+
     /**
      * winsows-31jエンコーディングされたと想定した2バイトデータ
      * の復号を試みる。
@@ -96,13 +105,6 @@ public final class Win31j{
         }
 
         return;
-    }
-
-    /**
-     * 隠しコンストラクタ。
-     */
-    private Win31j(){
-        throw new Error();
     }
 
 }

@@ -23,6 +23,43 @@ import jp.sourceforge.jindolf.corelib.PreDefAvatar;
  */
 public class VillageData{
 
+    private final List<PeriodResource> resourceList;
+
+    private final LandDef landDef;
+    private final int villageId;
+    private final String baseUri;
+
+    private String fullName = "";
+    private int commitHour = -1;
+    private int commitMinute = -1;
+    private String graveIconUri;
+
+    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
+    private int undefAvatarNo = 1;
+
+    private final List<PeriodData> periodList = new LinkedList<PeriodData>();
+
+
+    /**
+     * コンストラクタ。
+     * @param resourceList PeriodResource並び
+     */
+    public VillageData(List<PeriodResource> resourceList){
+        super();
+
+        validatePeriodResource(resourceList);
+
+        this.resourceList = new LinkedList<PeriodResource>(resourceList);
+
+        PeriodResource resource1st = this.resourceList.get(0);
+        this.landDef   = resource1st.getLandDef();
+        this.villageId = resource1st.getVillageId();
+        this.baseUri = getBaseUri(this.resourceList);
+
+        return;
+    }
+
+
     /**
      * PeriodResourceの組が正当かチェックする。
      * <ul>
@@ -115,42 +152,6 @@ public class VillageData{
         }
 
         return result;
-    }
-
-    private final List<PeriodResource> resourceList;
-
-    private final LandDef landDef;
-    private final int villageId;
-    private final String baseUri;
-
-    private String fullName = "";
-    private int commitHour = -1;
-    private int commitMinute = -1;
-    private String graveIconUri;
-
-    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
-    private int undefAvatarNo = 1;
-
-    private final List<PeriodData> periodList = new LinkedList<PeriodData>();
-
-
-    /**
-     * コンストラクタ。
-     * @param resourceList PeriodResource並び
-     */
-    public VillageData(List<PeriodResource> resourceList){
-        super();
-
-        validatePeriodResource(resourceList);
-
-        this.resourceList = new LinkedList<PeriodResource>(resourceList);
-
-        PeriodResource resource1st = this.resourceList.get(0);
-        this.landDef   = resource1st.getLandDef();
-        this.villageId = resource1st.getVillageId();
-        this.baseUri = getBaseUri(this.resourceList);
-
-        return;
     }
 
     /**

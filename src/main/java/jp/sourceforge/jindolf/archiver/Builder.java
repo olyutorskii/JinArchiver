@@ -29,6 +29,16 @@ public final class Builder{
 
     private static final int BUF_SZ = 100 * 1024;
 
+
+    /**
+     * 隠れコンストラクタ。
+     */
+    private Builder(){
+        super();
+        return;
+    }
+
+
     /**
      * 入力ストリームをデコードする。
      * @param charset 文字コード指定
@@ -100,14 +110,6 @@ public final class Builder{
             parser.parseAutomatic(content);
         }
 
-        return;
-    }
-
-    /**
-     * 隠れコンストラクタ。
-     */
-    private Builder(){
-        super();
         return;
     }
 

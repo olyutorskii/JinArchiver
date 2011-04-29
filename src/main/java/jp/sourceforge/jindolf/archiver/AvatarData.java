@@ -34,25 +34,12 @@ public class AvatarData{
         }
     }
 
-    /**
-     * プリセット済みAvatarをフルネームを用いて取得する。
-     * @param seq フルネーム
-     * @return 見つかったプリセット済みAvatar。見つからなければnull。
-     */
-    public static PreDefAvatar getPreDefAvatar(CharSequence seq){
-        for(PreDefAvatar avatar : PREDEF_AVATAR_LIST){
-            String fullName = avatar.getFullName();
-            if(fullName.contentEquals(seq)){
-                return avatar;
-            }
-        }
-        return null;
-    }
 
     private String fullName;
     private String shortName;
     private String avatarId;
     private String faceIconUri;
+
 
     /**
      * コンストラクタ。
@@ -75,6 +62,22 @@ public class AvatarData{
         this.faceIconUri = null;
 
         return;
+    }
+
+
+    /**
+     * プリセット済みAvatarをフルネームを用いて取得する。
+     * @param seq フルネーム
+     * @return 見つかったプリセット済みAvatar。見つからなければnull。
+     */
+    public static PreDefAvatar getPreDefAvatar(CharSequence seq){
+        for(PreDefAvatar avatar : PREDEF_AVATAR_LIST){
+            String fullName = avatar.getFullName();
+            if(fullName.contentEquals(seq)){
+                return avatar;
+            }
+        }
+        return null;
     }
 
     /**

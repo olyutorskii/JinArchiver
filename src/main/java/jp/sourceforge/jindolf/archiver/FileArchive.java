@@ -49,6 +49,15 @@ public final class FileArchive{
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.JAPAN);
     }
 
+
+    /**
+     * 隠れコンストラクタ。
+     */
+    private FileArchive(){
+        throw new Error();
+    }
+
+
     /**
      * ISO形式の日付時刻情報をパースする。
      * @param text 日付表記
@@ -155,13 +164,6 @@ public final class FileArchive{
         List<PeriodResource> result = parseDownList(lineReader);
         lineReader.close();
         return result;
-    }
-
-    /**
-     * 隠れコンストラクタ。
-     */
-    private FileArchive(){
-        throw new Error();
     }
 
 }

@@ -30,6 +30,9 @@ import jp.sourceforge.jindolf.parser.HtmlParseException;
  */
 public final class JinArchiver{
 
+    /** Generator. */
+    public static final String GENERATOR;
+
     /** このClass。 */
     private static final Class<?> SELF_KLASS;
     /** このPackage。 */
@@ -38,8 +41,6 @@ public final class JinArchiver{
     private static final String TITLE;
     /** バージョン。 */
     private static final String VERSION;
-    /** Generator. */
-    public static final String GENERATOR;
 
     private static final List<LandDef> LANDDEF_LIST;
 
@@ -66,6 +67,15 @@ public final class JinArchiver{
             throw new ExceptionInInitializerError(e);
         }
     }
+
+
+    /**
+     * 隠しコンストラクタ。
+     */
+    private JinArchiver(){
+        throw new Error();
+    }
+
 
     /**
      * リソース上のパッケージ定義プロパティをロードする。
@@ -410,13 +420,6 @@ public final class JinArchiver{
         parseOption(args);
         exit(0);
         return;
-    }
-
-    /**
-     * 隠しコンストラクタ。
-     */
-    private JinArchiver(){
-        throw new Error();
     }
 
 }

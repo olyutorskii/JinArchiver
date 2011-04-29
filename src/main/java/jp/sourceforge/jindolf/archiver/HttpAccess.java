@@ -30,6 +30,14 @@ import jp.sourceforge.jindolf.parser.SeqRange;
 public final class HttpAccess{
 
     /**
+     * 隠しコンストラクタ。
+     */
+    private HttpAccess(){
+        throw new Error();
+    }
+
+
+    /**
      * 日一覧ページ(エピローグの翌日)のURLを得る。
      * @param landDef 国指定
      * @param vid 村番号
@@ -82,13 +90,6 @@ public final class HttpAccess{
         List<PeriodResource> result = handler.getResourceList();
 
         return result;
-    }
-
-    /**
-     * 隠しコンストラクタ。
-     */
-    private HttpAccess(){
-        throw new Error();
     }
 
     /**

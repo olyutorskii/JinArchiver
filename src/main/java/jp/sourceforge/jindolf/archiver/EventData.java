@@ -20,6 +20,25 @@ import jp.sourceforge.jindolf.parser.DecodedContent;
  */
 public class EventData extends TopicData{
 
+    private SysEventType eventType = null;
+
+    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
+    private final List<Integer> intList = new LinkedList<Integer>();
+    private final List<GameRole> roleList = new LinkedList<GameRole>();
+    private final List<DecodedContent> strList =
+            new LinkedList<DecodedContent>();
+
+
+    /**
+     * コンストラクタ。
+     * @param periodData 所属元Period
+     */
+    public EventData(PeriodData periodData){
+        super();
+        return;
+    }
+
+
     /**
      * イベント種別からXML要素名を取得する。
      * @param type イベント種別
@@ -98,23 +117,6 @@ public class EventData extends TopicData{
         writer.append(' ');
         XmlUtils.attrOut(writer, "avatarId", avatar.getAvatarId());
         writer.append(" />\n");
-        return;
-    }
-
-    private SysEventType eventType = null;
-
-    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
-    private final List<Integer> intList = new LinkedList<Integer>();
-    private final List<GameRole> roleList = new LinkedList<GameRole>();
-    private final List<DecodedContent> strList =
-            new LinkedList<DecodedContent>();
-
-    /**
-     * コンストラクタ。
-     * @param periodData 所属元Period
-     */
-    public EventData(PeriodData periodData){
-        super();
         return;
     }
 

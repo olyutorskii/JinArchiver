@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
+import org.xml.sax.SAXException;
 
 /**
  * メインエントリ。
@@ -61,9 +63,11 @@ public final class JinArchiver{
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             LANDDEF_LIST = LandDef.buildLandDefList(builder);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
+        }catch(ParserConfigurationException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(IOException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(SAXException e){
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -290,15 +294,25 @@ public final class JinArchiver{
 
         try{
             dump(writer, landDef, vid);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            e.printStackTrace(System.err);
-            errprintln("処理を続行できません。");
-            exit(1);
-            return;
+        }catch(IOException e){
+            abortWithException(e);
+        }catch(DecodeException e){
+            abortWithException(e);
+        }catch(HtmlParseException e){
+            abortWithException(e);
         }
 
+        return;
+    }
+
+    /**
+     * 例外によるアプリ終了。
+     * @param e 例外
+     */
+    private static void abortWithException(Exception e){
+        e.printStackTrace(System.err);
+        errprintln("処理を続行できません。");
+        exit(1);
         return;
     }
 

@@ -48,6 +48,7 @@ public class ValidateTask implements Runnable{
      * 検証タスク。
      * {@inheritDoc}
      */
+    @Override
     public void run(){
         try{
             this.validator.validate(this.source);

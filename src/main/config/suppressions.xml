@@ -16,7 +16,23 @@
 
 <suppressions>
 
-    <suppress files="JinArchiver" checks="UncommentedMain" />
+    <suppress files="JinArchiver.java" checks="UncommentedMain" />
+    <suppress files="TopicData.java" checks="AbstractClassName" />
+
+<!--
+    <suppress files="" checks="ExecutableStatementCount" />
+
+    <suppress files="" checks="ClassDataAbstractionCoupling" />
+    <suppress files="" checks="ClassFanOutComplexity" />
+    <suppress files="" checks="CyclomaticComplexity" />
+    <suppress files="" checks="NPathComplexity" />
+    <suppress files="" checks="JavaNCSS" />
+-->
+
+<!--
+    <suppress files="" checks="MagicNumber" />
+    <suppress files="" checks="MultipleStringLiterals" />
+-->
 
 </suppressions>
 

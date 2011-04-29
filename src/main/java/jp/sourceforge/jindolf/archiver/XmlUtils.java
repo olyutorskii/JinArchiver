@@ -25,32 +25,30 @@ import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
 import jp.sourceforge.jindolf.parser.DecodedContent;
 
 /**
- * XML用各種ユーティリティ
+ * XML用各種ユーティリティ。
  */
 public final class XmlUtils{
 
-    public static final String ORIG_DTD =
+    private static final String ORIG_DTD =
             "http://jindolf.sourceforge.jp/xml/dtd/bbsArchive-110421.dtd";
-    public static final String ORIG_NS =
+    private static final String ORIG_NS =
             "http://jindolf.sourceforge.jp/xml/ns/501";
-    public static final String ORIG_SCHEME =
+    private static final String ORIG_SCHEME =
             "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-110421.xsd";
-    public static final String SCHEMA_NS =
+    private static final String SCHEMA_NS =
             "http://www.w3.org/2001/XMLSchema-instance";
 
-    public static final String OUTPATH = "D:\\TEMP\\zxzx\\";
+    private static final String OUTPATH = "D:\\TEMP\\zxzx\\";
 
     private static final char BS_CHAR = (char) 0x005c; // Backslash
     private static final String INDENT_UNIT = "\u0020\u0020";
 
     private static final TimeZone TZ_TOKYO =
             TimeZone.getTimeZone("Asia/Tokyo");
-    private static final GregorianCalendar calendar =
-            new GregorianCalendar(TZ_TOKYO);
 
 
     /**
-     * 隠れコンストラクタ
+     * 隠れコンストラクタ。
      */
     private XmlUtils(){
         throw new Error();
@@ -338,24 +336,25 @@ public final class XmlUtils{
                                       CharSequence name,
                                       long epochMs)
             throws IOException{
-        synchronized(calendar){
-            calendar.setTimeInMillis(epochMs);
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH) + 1;
-            int day = calendar.get(Calendar.DATE);
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            int sec = calendar.get(Calendar.SECOND);
-            int msec = calendar.get(Calendar.MILLISECOND);
+        Calendar calendar = new GregorianCalendar(TZ_TOKYO);
 
-            String attrVal = MessageFormat.format(
-                     "{0,number,#0000}-{1,number,#00}-{2,number,#00}"
-                    +"T{3,number,#00}:{4,number,#00}:{5,number,#00}"
-                    +".{6,number,#000}+09:00",
-                    year, month, day, hour, minute, sec, msec);
+        calendar.setTimeInMillis(epochMs);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DATE);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int sec = calendar.get(Calendar.SECOND);
+        int msec = calendar.get(Calendar.MILLISECOND);
 
-            attrOut(writer, name, attrVal);
-        }
+        String attrVal = MessageFormat.format(
+                 "{0,number,#0000}-{1,number,#00}-{2,number,#00}"
+                +"T{3,number,#00}:{4,number,#00}:{5,number,#00}"
+                +".{6,number,#000}+09:00",
+                year, month, day, hour, minute, sec, msec);
+
+        attrOut(writer, name, attrVal);
+
         return;
     }
 

@@ -40,12 +40,22 @@ public final class XmlUtils{
 
     public static final String OUTPATH = "D:\\TEMP\\zxzx\\";
 
+    private static final char BS_CHAR = (char) 0x005c; // Backslash
     private static final String INDENT_UNIT = "\u0020\u0020";
 
     private static final TimeZone TZ_TOKYO =
             TimeZone.getTimeZone("Asia/Tokyo");
     private static final GregorianCalendar calendar =
             new GregorianCalendar(TZ_TOKYO);
+
+
+    /**
+     * 隠れコンストラクタ
+     */
+    private XmlUtils(){
+        throw new Error();
+    }
+
 
     /**
      * DOCTYPE宣言を出力する。
@@ -231,7 +241,7 @@ public final class XmlUtils{
                     writer.append("&quot;");
                 }else if(chVal == '\''){
                     writer.append("&apos;");
-                }else if(chVal == '\u005c\u005c'){
+                }else if(chVal == BS_CHAR){
                     writer.append('\u00a5');
                 }else if(chVal == '\u007e'){
                     writer.append('\u203e');
@@ -484,13 +494,6 @@ public final class XmlUtils{
         writer = new OutputStreamWriter(ostream, "UTF-8");
         writer = new BufferedWriter(writer, 10000);
         return writer;
-    }
-
-    /**
-     * 隠れコンストラクタ
-     */
-    private XmlUtils(){
-        throw new Error();
     }
 
 }

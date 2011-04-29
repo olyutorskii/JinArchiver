@@ -50,13 +50,20 @@ public class ValidateTask implements Runnable{
      */
     @Override
     public void run(){
+        boolean done = false;
         try{
             this.validator.validate(this.source);
-        }catch(Throwable e){
+            done = true;
+        }catch(IOException e){
             e.printStackTrace(System.err);
             System.err.println("XML検証に失敗しました。");
-            System.exit(1);
+        }catch(SAXException e){
+            e.printStackTrace(System.err);
+            System.err.println("XML検証に失敗しました。");
+        }finally{
+            if( ! done ) System.exit(1);
         }
+
         return;
     }
 

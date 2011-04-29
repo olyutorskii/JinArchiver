@@ -12,7 +12,9 @@ import java.io.Writer;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import jp.sourceforge.jindolf.corelib.PreDefAvatar;
+import org.xml.sax.SAXException;
 
 /**
  * Avatarモデル。
@@ -27,9 +29,11 @@ public class AvatarData{
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             PREDEF_AVATAR_LIST = PreDefAvatar.buildPreDefAvatarList(builder);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
+        }catch(ParserConfigurationException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(IOException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(SAXException e){
             throw new ExceptionInInitializerError(e);
         }
     }

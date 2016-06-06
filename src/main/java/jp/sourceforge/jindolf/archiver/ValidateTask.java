@@ -12,11 +12,8 @@ import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.io.Reader;
 import java.io.Writer;
-import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
 
@@ -24,9 +21,6 @@ import org.xml.sax.SAXException;
  * XML検証タスク。
  */
 public class ValidateTask implements Runnable{
-
-    private static final SchemaFactory FACTORY =
-            SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
     private final Validator validator;
     private final Source source;
@@ -38,8 +32,7 @@ public class ValidateTask implements Runnable{
      */
     protected ValidateTask(Reader reader) throws SAXException{
         super();
-        Schema schema = FACTORY.newSchema();
-        this.validator = schema.newValidator();
+        this.validator = XmlUtils.createValidator();
         this.source = new StreamSource(reader);
         return;
     }

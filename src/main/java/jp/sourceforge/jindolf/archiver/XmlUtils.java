@@ -14,8 +14,16 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
 import jp.sourceforge.jindolf.parser.DecodedContent;
+import org.xml.sax.SAXException;
 
 /**
  * XML用各種ユーティリティ。
@@ -45,6 +53,40 @@ public final class XmlUtils{
         throw new Error();
     }
 
+
+    /**
+     * XML読み込み用DocumentBuilderを生成する。
+     * @return DocumentBuilder
+     * @throws ParserConfigurationException 実装が要求に応えられない。
+     */
+    public static DocumentBuilder createDocumentBuilder()
+            throws ParserConfigurationException {
+        DocumentBuilderFactory factory;
+        factory = DocumentBuilderFactory.newInstance();
+
+        DocumentBuilder builder;
+        builder = factory.newDocumentBuilder();
+
+        return builder;
+    }
+
+    /**
+     * バリデータを生成する。
+     * @return バリデータ
+     * @throws SAXException 実装が要求に応えられない。
+     */
+    public static Validator createValidator() throws SAXException{
+        SchemaFactory factory;
+        String nsuri = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+        factory = SchemaFactory.newInstance(nsuri);
+
+        Schema schema;
+        schema = factory.newSchema();
+
+        Validator validator = schema.newValidator();
+
+        return validator;
+    }
 
     /**
      * DOCTYPE宣言を出力する。

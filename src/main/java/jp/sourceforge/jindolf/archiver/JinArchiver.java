@@ -19,13 +19,9 @@ import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
-import org.xml.sax.SAXException;
 
 /**
  * メインエントリ。
@@ -44,10 +40,9 @@ public final class JinArchiver{
     /** バージョン。 */
     private static final String VERSION;
 
-    private static final List<LandDef> LANDDEF_LIST;
-
     /** バージョン定義リソース。 */
     private static final String RES_VERDEF = "resources/version.properties";
+
 
     static{
         SELF_KLASS   = JinArchiver.class;
@@ -57,19 +52,6 @@ public final class JinArchiver{
         TITLE   = getPackageInfo(verProp, "pkg-title.",   "Unknown");
         VERSION = getPackageInfo(verProp, "pkg-version.", "0");
         GENERATOR = TITLE + " " + VERSION;
-
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-        try{
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            LANDDEF_LIST = LandDef.buildLandDefList(builder);
-        }catch(ParserConfigurationException e){
-            throw new ExceptionInInitializerError(e);
-        }catch(IOException e){
-            throw new ExceptionInInitializerError(e);
-        }catch(SAXException e){
-            throw new ExceptionInInitializerError(e);
-        }
     }
 
 
@@ -159,18 +141,6 @@ public final class JinArchiver{
     }
 
     /**
-     * 国IDから国情報を得る。
-     * @param landId 国ID
-     * @return 国情報
-     */
-    public static LandDef getLandDef(String landId){
-        for(LandDef landDef : LANDDEF_LIST){
-            if(landDef.getLandId().equals(landId)) return landDef;
-        }
-        return null;
-    }
-
-    /**
      * ヘルプメッセージ出力。
      */
     private static void helpMessage(){
@@ -183,10 +153,8 @@ public final class JinArchiver{
                 +"-stdout\n\t標準出力へ出力\n\n"
                 +"※ -outdir と -stdout は排他指定\n"
                 );
-        StringBuilder landList = new StringBuilder();
-        for(LandDef landDef : LANDDEF_LIST){
-            landList.append(landDef.getLandId()).append(' ');
-        }
+
+        String landList = LandUtils.getLandList();
         errprintln("利用可能な国識別子は " + landList + "\n");
 
         return;
@@ -238,7 +206,7 @@ public final class JinArchiver{
 
             String val = args[pos];
             if(arg.equals("-land")){
-                landDef = getLandDef(val);
+                landDef = LandUtils.getLandDef(val);
                 if(landDef == null){
                     errprintln("不正な国識別子です。 " + val);
                     exit(1);

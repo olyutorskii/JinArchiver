@@ -15,7 +15,7 @@
 ※ このアーカイブにはJindolfの実行バイナリは含まれていません。
 　 Jindolfを動かしたい方は、jindolfで始まり拡張子が*.jarであるファイルを
 　 別途入手してください。
-※ 人狼BBSのURLは [ http://homepage2.nifty.com/ninjinia/ ] まで
+※ 人狼BBSのURLは [ http://ninjinix.com/ ] まで
 ※ 人狼BBSを主催するninjin氏は、JinArchiverの製作に一切関与していません。
 　 JinArchiverに関する問い合わせををninjin氏へ投げかけないように！約束だよ！
 
@@ -32,13 +32,13 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 === ソースコードに関して ===
 
  - JinArchiverはJava言語(JLS3)で記述されたプログラムです。
- - JinArchiverはJRE1.5に準拠したJava実行環境で利用できるように作られています。
-   原則として、JRE1.5に準拠した実行系であれば、プラットフォームを選びません。
+ - JinArchiverはJRE1.7に準拠したJava実行環境で利用できるように作られています。
+   原則として、JRE1.7に準拠した実行系であれば、プラットフォームを選びません。
 
 
 === 開発プロジェクト運営元 ===
 
-  http://sourceforge.jp/projects/jindolf/ まで。
+  https://osdn.jp/projects/jindolf/ まで。
 
 
 === ディレクトリ内訳構成 ===

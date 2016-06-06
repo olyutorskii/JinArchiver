@@ -10,10 +10,10 @@
 
   このアーカイブの原本は、Mercurial(hg)でバージョン管理されています。
   このアーカイブの原本となる開発資産は、
-      http://hg.sourceforge.jp/view/jindolf/JinArchiver/
+      https://osdn.jp/projects/jindolf/scm/hg/JinArchiver/
   を上位に持つMercurialリポジトリで管理されています。
   アーカイブの代わりにMercurialを通じての開発資産へのアクセスが可能です。
-  # hg clone http://hg.sourceforge.jp/view/jindolf/JinArchiver/
+  # hg clone http://hg.osdn.jp/view/jindolf/JinArchiver
 
 
 === 各種設定ファイル ===

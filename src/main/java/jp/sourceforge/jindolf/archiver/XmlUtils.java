@@ -7,20 +7,13 @@
 
 package jp.sourceforge.jindolf.archiver;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
-import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
 import jp.sourceforge.jindolf.parser.DecodedContent;
 
@@ -37,8 +30,6 @@ public final class XmlUtils{
             "http://jindolf.sourceforge.jp/xml/xsd/bbsArchive-110421.xsd";
     private static final String SCHEMA_NS =
             "http://www.w3.org/2001/XMLSchema-instance";
-
-    private static final String OUTPATH = "D:\\TEMP\\zxzx\\";
 
     private static final char BS_CHAR = (char) 0x005c; // Backslash
     private static final String INDENT_UNIT = "\u0020\u0020";
@@ -457,42 +448,6 @@ public final class XmlUtils{
         writer.flush();
 
         return;
-    }
-
-    /**
-     * 村情報を反映した出力ファイル名を生成する。
-     * @param village 村情報
-     * @return XML出力ファイル名
-     */
-    public static String createOutFileName(VillageData village){
-        LandDef landDef = village.getLandDef();
-        String landId = landDef.getLandId();
-        int vid = village.getVillageId();
-
-        String fname =
-                MessageFormat.format(
-                "{0}jin_{1}_{2,number,#00000}.xml", OUTPATH, landId, vid);
-        return fname;
-    }
-
-    /**
-     * 村情報を反映した出力ファイルへの文字ストリームを生成する。
-     * @param village 村情報
-     * @return 出力先文字ストリーム
-     * @throws IOException 出力エラー
-     */
-    public static Writer createFileWriter(VillageData village)
-            throws IOException{
-        String fname = createOutFileName(village);
-        File file = new File(fname);
-
-        OutputStream ostream;
-        ostream = new FileOutputStream(file);
-        ostream = new BufferedOutputStream(ostream, 10000);
-        Writer writer;
-        writer = new OutputStreamWriter(ostream, "UTF-8");
-        writer = new BufferedWriter(writer, 10000);
-        return writer;
     }
 
 }

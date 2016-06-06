@@ -87,7 +87,7 @@ public final class JinArchiver{
      * @param klass パッケージを構成する任意のクラス
      * @return プロパティ
      */
-    private static Properties loadVersionDefinition(Class klass){
+    private static Properties loadVersionDefinition(Class<?> klass){
         Properties result = new Properties();
 
         InputStream istream = klass.getResourceAsStream(RES_VERDEF);

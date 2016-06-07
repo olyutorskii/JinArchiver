@@ -15,7 +15,7 @@ import jp.sourceforge.jindolf.corelib.LandDef;
 import org.xml.sax.SAXException;
 
 /**
- * 国周りの各種情報提供。
+ * 国情報の各種アクセス。
  */
 public final class LandUtils{
 
@@ -33,7 +33,9 @@ public final class LandUtils{
 
         try{
             LANDDEF_LIST = LandDef.buildLandDefList(builder);
-        }catch(IOException | SAXException e){
+        }catch(IOException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(SAXException e){
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -67,15 +69,18 @@ public final class LandUtils{
      * 各識別子は空白記号で区切られる。
      * @return 一覧文字列
      */
-    public static String getLandList(){
-        StringBuilder landList = new StringBuilder();
+    public static String getLandIdCatalog(){
+        StringBuilder catalog = new StringBuilder();
 
         for(LandDef landDef : LANDDEF_LIST){
+            if(catalog.length() > 0){
+                catalog.append(DELIM_SP);
+            }
             String id = landDef.getLandId();
-            landList.append(id).append(DELIM_SP);
+            catalog.append(id);
         }
 
-        String result = landList.toString();
+        String result = catalog.toString();
         return result;
     }
 

@@ -59,7 +59,8 @@ public final class JinArchiver{
      * 隠しコンストラクタ。
      */
     private JinArchiver(){
-        throw new Error();
+        assert false;
+        throw new AssertionError();
     }
 
 
@@ -73,16 +74,15 @@ public final class JinArchiver{
         Properties result = new Properties();
 
         InputStream istream = klass.getResourceAsStream(RES_VERDEF);
+
         try{
-            result.load(istream);
-        }catch(IOException e){
-            return result;
-        }finally{
             try{
+                result.load(istream);
+            }finally{
                 istream.close();
-            }catch(IOException e){
-                return result;
             }
+        }catch(IOException e){
+            // NOTHING
         }
 
         return result;
@@ -144,112 +144,20 @@ public final class JinArchiver{
      * ヘルプメッセージ出力。
      */
     private static void helpMessage(){
-        errprintln(
-                "\n" + GENERATOR + " 人狼BBS アーカイブ作成ツール\n\n"
-                +"-h, -help, -?\n\tヘルプメッセージ\n"
-                +"-land 国識別子\n"
-                +"-vid 村番号\n"
-                +"-outdir 出力ディレクトリ\n"
-                +"-stdout\n\t標準出力へ出力\n\n"
-                +"※ -outdir と -stdout は排他指定\n"
-                );
-
-        String landList = LandUtils.getLandList();
-        errprintln("利用可能な国識別子は " + landList + "\n");
-
+        String msg = OptArg.getHelpMessage(GENERATOR);
+        errprintln(msg);
         return;
     }
 
     /**
      * オプション文字列を解析する。
-     * @param args オプション文字列
+     * @param optInfo オプション情報
      */
-    private static void parseOption(String[] args){
-        if(args.length <= 0){
-            helpMessage();
-            exit(0);
-            return;
-        }
+    private static void dumpOut(OptInfo optInfo){
 
-        LandDef landDef = null;
-        int vid = -1;
-        String outdir = null;
-        boolean stdout = false;
-
-        for(int pos = 0; pos < args.length; pos++){
-            String arg = args[pos];
-
-            if( ! arg.startsWith("-") ){
-                errprintln("不正なオプションです。 " + arg);
-                exit(1);
-                return;
-            }
-
-            if(arg.equals("-h") || arg.equals("-help") || arg.equals("-?")){
-                helpMessage();
-                exit(0);
-                return;
-            }
-
-            if(arg.equals("-stdout")){
-                stdout = true;
-                outdir = null;
-                continue;
-            }
-
-            if(++pos >= args.length){
-                errprintln(
-                        "オプション " + arg + " に引数がありません。");
-                exit(1);
-                return;
-            }
-
-            String val = args[pos];
-            if(arg.equals("-land")){
-                landDef = LandUtils.getLandDef(val);
-                if(landDef == null){
-                    errprintln("不正な国識別子です。 " + val);
-                    exit(1);
-                    return;
-                }
-            }else if(arg.equals("-vid")){
-                vid = Integer.parseInt(val);
-                if(vid < 0){
-                    errprintln("不正な村番号です。 " + vid);
-                    exit(1);
-                    return;
-                }
-            }else if(arg.equals("-outdir")){
-                outdir = val;
-                stdout = false;
-            }else{
-                errprintln("不正なオプションです。 " + arg);
-                exit(1);
-                return;
-            }
-        }
-
-        if(landDef == null){
-            errprintln(
-                    "-land オプションで国識別子を指定してください。");
-            exit(1);
-            return;
-        }
-
-        if(vid < 0){
-            errprintln(
-                    "-vid オプションで村番号を指定してください。");
-            exit(1);
-            return;
-        }
-
-        if(   (outdir == null && stdout == false)
-           || (outdir != null && stdout == true)  ){
-            errprintln(
-                    "-outdir か -stdout のどちらか一方を指定してください。");
-            exit(1);
-            return;
-        }
+        String outdir   = optInfo.getOutdir();
+        LandDef landDef = optInfo.getLandDef();
+        int vid         = optInfo.getVid();
 
         Writer writer;
         if(outdir != null){
@@ -335,63 +243,63 @@ public final class JinArchiver{
     public static Writer getFileWriter(String outdir,
                                          LandDef landDef,
                                          int vid ){
-            File outFile = new File(outdir);
-            if( ! outFile.exists() ){
-                errprintln(
-                        outdir + " が存在しません。");
-                exit(1);
-                return null;
-            }
-            if( ! outFile.isDirectory() ){
-                errprintln(
-                        outdir + " はディレクトリではありません。");
-                exit(1);
-                return null;
-            }
-            if( ! outFile.canWrite() ){
-                errprintln(
-                        outdir + " に書き込めません。");
-                exit(1);
-                return null;
-            }
-            String fname = MessageFormat.format(
-                "jin_{0}_{1,number,#00000}.xml", landDef.getLandId(), vid);
-            File xmlFile = new File(outFile, fname);
-            boolean created;
-            try{
-                created = xmlFile.createNewFile();
-            }catch(IOException e){
-                errprintln(
-                        xmlFile.getName() + " が作成できません。");
-                exit(1);
-                return null;
-            }
-            if( ! created ){
-                errprintln(
-                        fname + " が既に" + outdir + "に存在します。");
-                exit(1);
-                return null;
-            }
-            /* JRE 1.6 only
-            xmlFile.setReadable(true);
-            xmlFile.setWritable(true);
-            xmlFile.setExecutable(false, false);
-            */
-            Writer writer;
-            try{
-                OutputStream ostream;
-                ostream = new FileOutputStream(xmlFile);
-                ostream = new BufferedOutputStream(ostream, 4 * 1024);
-                writer = new OutputStreamWriter(ostream, "UTF-8");
-                writer = new BufferedWriter(writer, 4 * 1024);
-            }catch(IOException e){
-                errprintln(
-                        xmlFile.getName() + " に書き込めません。");
-                exit(1);
-                return null;
-            }
+        File outFile = new File(outdir);
+        if( ! outFile.exists() ){
+            errprintln(
+                    outdir + " が存在しません。");
+            exit(1);
+            return null;
+        }
+        if( ! outFile.isDirectory() ){
+            errprintln(
+                    outdir + " はディレクトリではありません。");
+            exit(1);
+            return null;
+        }
+        if( ! outFile.canWrite() ){
+            errprintln(
+                    outdir + " に書き込めません。");
+            exit(1);
+            return null;
+        }
+        String fname = MessageFormat.format(
+            "jin_{0}_{1,number,#00000}.xml", landDef.getLandId(), vid);
+        File xmlFile = new File(outFile, fname);
+        boolean created;
+        try{
+            created = xmlFile.createNewFile();
+        }catch(IOException e){
+            errprintln(
+                    xmlFile.getName() + " が作成できません。");
+            exit(1);
+            return null;
+        }
+        if( ! created ){
+            errprintln(
+                    fname + " が既に" + outdir + "に存在します。");
+            exit(1);
+            return null;
+        }
+        /* JRE 1.6 only
+        xmlFile.setReadable(true);
+        xmlFile.setWritable(true);
+        xmlFile.setExecutable(false, false);
+        */
+        Writer writer;
+        try{
+            OutputStream ostream;
+            ostream = new FileOutputStream(xmlFile);
+            ostream = new BufferedOutputStream(ostream, 4 * 1024);
+            writer = new OutputStreamWriter(ostream, "UTF-8");
+            writer = new BufferedWriter(writer, 4 * 1024);
+        }catch(IOException e){
+            errprintln(
+                    xmlFile.getName() + " に書き込めません。");
+            exit(1);
+            return null;
+        }
 
-            return writer;
+        return writer;
     }
 
     /**
@@ -399,8 +307,28 @@ public final class JinArchiver{
      * @param args 引数
      */
     public static void main(String[] args){
-        parseOption(args);
+        OptInfo optInfo = OptInfo.parseOptInfo(args);
+
+        if(optInfo.isHelp()){
+            helpMessage();
+            exit(0);
+            assert false;
+            return;
+        }
+
+        if(optInfo.hasError()){
+            String errMsg = optInfo.getErrMsg();
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+            return;
+        }
+
+        dumpOut(optInfo);
+
         exit(0);
+        assert false;
+
         return;
     }
 

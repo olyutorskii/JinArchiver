@@ -15,8 +15,8 @@ import jp.sourceforge.jindolf.corelib.LandDef;
 
 /**
  * オプション情報。
- * <p>
- * ヘルプ指定がある場合、他の情報は無効。
+ *
+ * <p>ヘルプ指定がある場合、他の情報は無効。
  * ヘルプ指定が無くエラー情報がある場合、他の情報は無効。
  */
 public final class OptInfo{
@@ -248,17 +248,6 @@ public final class OptInfo{
      */
     public String getErrMsg(){
         return this.errMsg;
-    }
-
-    /**
-     * エラーの有無を返す。
-     * @return エラー情報があればtrue
-     */
-    public boolean hasError(){
-        if(this.isHelp) return false;
-        if(this.errMsg == null) return false;
-
-        return true;
     }
 
     /**

@@ -8,6 +8,7 @@
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,13 +16,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
+import javax.xml.validation.Validator;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
+import org.xml.sax.SAXException;
 
 /**
  * メインエントリ。
@@ -166,16 +170,49 @@ public final class JinArchiver{
             writer = getStdOutWriter();
         }
 
-        writer = ValidateTask.wrapValidator(writer);
+        SnifWriter snifWriter = new SnifWriter(writer);
+        Reader reader = snifWriter.getSnifReader();
 
+        writer = new BufferedWriter(snifWriter);
+        reader = new BufferedReader(reader);
+
+        Validator validator;
         try{
-            dump(writer, landDef, vid);
+            validator = XmlUtils.createValidator();
+        }catch(SAXException e){
+            abortWithException(e, "処理を続行できません。");
+            return;
+        }
+
+        VillageData villageData;
+        try{
+            villageData = load(landDef, vid);
         }catch(IOException e){
             abortWithException(e);
+            return;
         }catch(DecodeException e){
             abortWithException(e);
+            return;
         }catch(HtmlParseException e){
             abortWithException(e);
+            return;
+        }
+
+        ValidateTask valTask = new ValidateTask(reader, validator);
+        DumpXmlTask dumpTask = new DumpXmlTask(villageData, writer);
+
+        ProdCons taskman = new ProdCons(dumpTask, valTask);
+        try{
+            taskman.submit();
+        }catch(InterruptedException e){
+            abortWithException(e);
+        }
+
+        if(taskman.hasError()){
+            Throwable cause = taskman.getCause();
+            String desc = taskman.getErrDescription();
+            abortWithException(cause, desc);
+            assert false;
         }
 
         return;
@@ -185,32 +222,42 @@ public final class JinArchiver{
      * 例外によるアプリ終了。
      * @param e 例外
      */
-    private static void abortWithException(Exception e){
+    private static void abortWithException(Throwable e){
+        abortWithException(e, "処理を続行できません。");
+        exit(1);
+        return;
+    }
+
+    /**
+     * 例外によるアプリ終了。
+     * @param e 例外
+     * @param desc 詳細テキスト
+     */
+    private static void abortWithException(Throwable e, String desc){
         e.printStackTrace(System.err);
-        errprintln("処理を続行できません。");
+        errprintln(desc);
         exit(1);
         return;
     }
 
     /**
      * 主処理。人狼サーバからXHTMLを読み込み。XMLで出力。
-     * @param writer 出力先
      * @param landDef 国情報
      * @param vid 村番号
+     * @return 村情報
      * @throws IOException 入出力エラー
      * @throws DecodeException デコードエラー
      * @throws HtmlParseException パースエラー
      */
-    public static void dump(Writer writer, LandDef landDef, int vid)
+    public static VillageData load(LandDef landDef, int vid)
             throws IOException, DecodeException, HtmlParseException{
         List<PeriodResource> resourceList =
                 HttpAccess.loadResourceList(landDef, vid);
-        VillageData village = new VillageData(resourceList);
+        VillageData villageData = new VillageData(resourceList);
 
-        Builder.fillVillageData(village);
-        XmlUtils.dumpVillageData(writer, village);
+        Builder.fillVillageData(villageData);
 
-        return;
+        return villageData;
     }
 
     /**

@@ -38,10 +38,10 @@ EOL Extensionを有効にしないと設定が反映されません。
 
 === リンク ===
 
-・http://mercurial.selenic.com/
-・http://mercurial.selenic.com/wiki/.hgignore
-・http://www.selenic.com/mercurial/hgignore.5.html
-・http://mercurial.selenic.com/wiki/EolExtension
+・https://www.mercurial-scm.org/
+・https://www.mercurial-scm.org/wiki/.hgignore
+・https://www.selenic.com/mercurial/hgignore.5.html
+・https://www.mercurial-scm.org/wiki/EolExtension
 ・http://tortoisehg.bitbucket.org/
 
 

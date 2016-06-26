@@ -185,7 +185,7 @@ public final class HttpAccess{
         @Override
         public void startParse(DecodedContent content)
                 throws HtmlParseException{
-            this.resourceList = new LinkedList<PeriodResource>();
+            this.resourceList = new LinkedList<>();
             this.progressDays = 0;
             this.hasDone = false;
             return;

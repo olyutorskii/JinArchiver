@@ -31,7 +31,7 @@ public class PeriodData{
     private DisclosureType disclosureType = DisclosureType.HOT;
     private boolean hasMurderResult = false;
 
-    private final List<TopicData> topicList = new LinkedList<TopicData>();
+    private final List<TopicData> topicList = new LinkedList<>();
 
     /**
      * コンストラクタ。

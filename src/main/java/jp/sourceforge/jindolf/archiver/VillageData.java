@@ -34,10 +34,10 @@ public class VillageData{
     private int commitMinute = -1;
     private String graveIconUri;
 
-    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
+    private final List<AvatarData> avatarList = new LinkedList<>();
     private int undefAvatarNo = 1;
 
-    private final List<PeriodData> periodList = new LinkedList<PeriodData>();
+    private final List<PeriodData> periodList = new LinkedList<>();
 
 
     /**
@@ -49,7 +49,7 @@ public class VillageData{
 
         validatePeriodResource(resourceList);
 
-        this.resourceList = new LinkedList<PeriodResource>(resourceList);
+        this.resourceList = new LinkedList<>(resourceList);
 
         PeriodResource resource1st = this.resourceList.get(0);
         this.landDef   = resource1st.getLandDef();

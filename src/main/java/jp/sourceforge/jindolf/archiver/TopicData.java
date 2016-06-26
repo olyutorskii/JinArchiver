@@ -20,8 +20,7 @@ public abstract class TopicData{
 
     private static final DecodedContent BREAK = new DecodedContent("\n");
 
-    private final List<DecodedContent> lineList =
-            new LinkedList<DecodedContent>();
+    private final List<DecodedContent> lineList = new LinkedList<>();
 
     /**
      * コンストラクタ。

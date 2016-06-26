@@ -22,11 +22,11 @@ public class EventData extends TopicData{
 
     private SysEventType eventType = null;
 
-    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
-    private final List<Integer> intList = new LinkedList<Integer>();
-    private final List<GameRole> roleList = new LinkedList<GameRole>();
+    private final List<AvatarData> avatarList = new LinkedList<>();
+    private final List<Integer> intList = new LinkedList<>();
+    private final List<GameRole> roleList = new LinkedList<>();
     private final List<DecodedContent> strList =
-            new LinkedList<DecodedContent>();
+            new LinkedList<>();
 
 
     /**
@@ -504,6 +504,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
+    @Override
     public void dumpXml(Writer writer) throws IOException{
         String tagName = getTagName(this.eventType);
 

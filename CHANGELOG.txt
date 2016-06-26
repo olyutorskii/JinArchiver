@@ -5,8 +5,9 @@ JinArchiver 変更履歴
 
 
 X.XXX.X (20XX-XX-XX)
-    ・Maven3に対応。
-    ・SourceForge.JP から OSDN.JP への変更に対応。
+    ・必須環境をJRE7に引き上げ。
+    ・Mavenプラグイン更新。
+    ・OSDN.JP対応。
 
 1.502.2 (2011-04-21)
     ・110421版スキーマに対応。

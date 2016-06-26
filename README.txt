@@ -31,7 +31,7 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 
 === ソースコードに関して ===
 
- - JinArchiverはJava言語(JLS3)で記述されたプログラムです。
+ - JinArchiverはJava言語(JavaSE7)で記述されたプログラムです。
  - JinArchiverはJRE1.7に準拠したJava実行環境で利用できるように作られています。
    原則として、JRE1.7に準拠した実行系であれば、プラットフォームを選びません。
 

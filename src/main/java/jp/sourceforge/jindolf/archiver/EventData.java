@@ -8,7 +8,6 @@
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import jp.sourceforge.jindolf.corelib.GameRole;
@@ -111,12 +110,13 @@ public class EventData extends TopicData{
      * @param avatar Avatar
      * @throws IOException 出力エラー
      */
-    public static void dumpAvatarRef(Writer writer, AvatarData avatar)
+    public static void dumpAvatarRef(XmlOut writer, AvatarData avatar)
             throws IOException{
         writer.append("<avatarRef");
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "avatarId", avatar.getAvatarId());
-        writer.append(" />\n");
+        writer.sp();
+        writer.attrOut("avatarId", avatar.getAvatarId());
+        writer.append(" />");
+        writer.nl();
         return;
     }
 
@@ -178,14 +178,14 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpOnstageAttr(Writer writer) throws IOException{
+    public void dumpOnstageAttr(XmlOut writer) throws IOException{
         int entryNo = this.intList.get(0);
         AvatarData avatarData = this.avatarList.get(0);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "entryNo", Integer.toString(entryNo));
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "avatarId", avatarData.getAvatarId());
+        writer.sp();
+        writer.attrOut("entryNo", Integer.toString(entryNo));
+        writer.sp();
+        writer.attrOut("avatarId", avatarData.getAvatarId());
 
         return;
     }
@@ -195,11 +195,11 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpSingleAvatarAttr(Writer writer) throws IOException{
+    public void dumpSingleAvatarAttr(XmlOut writer) throws IOException{
         AvatarData avatarData = this.avatarList.get(0);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "avatarId", avatarData.getAvatarId());
+        writer.sp();
+        writer.attrOut("avatarId", avatarData.getAvatarId());
 
         return;
     }
@@ -209,12 +209,12 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpCountingAttr(Writer writer) throws IOException{
+    public void dumpCountingAttr(XmlOut writer) throws IOException{
         int total = this.avatarList.size();
         if(total % 2 != 0){
             AvatarData victim = this.avatarList.get(total - 1);
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "victim", victim.getAvatarId());
+            writer.sp();
+            writer.attrOut("victim", victim.getAvatarId());
         }
         return;
     }
@@ -224,13 +224,13 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpExecutionAttr(Writer writer) throws IOException{
+    public void dumpExecutionAttr(XmlOut writer) throws IOException{
         int totalAvatar = this.avatarList.size();
         int totalVotes = this.intList.size();
         if(totalAvatar != totalVotes){
             AvatarData victim = this.avatarList.get(totalAvatar - 1);
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "victim", victim.getAvatarId());
+            writer.sp();
+            writer.attrOut("victim", victim.getAvatarId());
         }
         return;
     }
@@ -240,20 +240,20 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpAskEntryAttr(Writer writer) throws IOException{
+    public void dumpAskEntryAttr(XmlOut writer) throws IOException{
         int hour     = this.intList.get(0);
         int minute   = this.intList.get(1);
         int minLimit = this.intList.get(2);
         int maxLimit = this.intList.get(3);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "commitTime", hour, minute);
+        writer.sp();
+        writer.timeAttrOut("commitTime", hour, minute);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "minMembers", Integer.toString(minLimit));
+        writer.sp();
+        writer.attrOut("minMembers", Integer.toString(minLimit));
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "maxMembers", Integer.toString(maxLimit));
+        writer.sp();
+        writer.attrOut("maxMembers", Integer.toString(maxLimit));
 
         return;
     }
@@ -263,15 +263,15 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpAskCommitAttr(Writer writer) throws IOException{
+    public void dumpAskCommitAttr(XmlOut writer) throws IOException{
         int hour     = this.intList.get(0);
         int minute   = this.intList.get(1);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "limitVote", hour, minute);
+        writer.sp();
+        writer.timeAttrOut("limitVote", hour, minute);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "limitSpecial", hour, minute);
+        writer.sp();
+        writer.timeAttrOut("limitSpecial", hour, minute);
 
         return;
     }
@@ -281,7 +281,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpStayEpilogueAttr(Writer writer) throws IOException{
+    public void dumpStayEpilogueAttr(XmlOut writer) throws IOException{
         GameRole role = this.roleList.get(0);
         int hour   = this.intList.get(0);
         int minute = this.intList.get(1);
@@ -293,11 +293,11 @@ public class EventData extends TopicData{
         case HAMSTER:  winner = "hamster"; break;
         default: throw new IllegalArgumentException();
         }
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "maxMembers", winner);
+        writer.sp();
+        writer.attrOut("maxMembers", winner);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "limitTime", hour, minute);
+        writer.sp();
+        writer.timeAttrOut("limitTime", hour, minute);
 
         return;
     }
@@ -307,7 +307,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpOpenroleElem(Writer writer) throws IOException{
+    public void dumpOpenroleElem(XmlOut writer) throws IOException{
         int num = this.roleList.size();
         for(int index = 0; index < num; index++){
             int heads = this.intList.get(index);
@@ -315,11 +315,12 @@ public class EventData extends TopicData{
             String roleName = getRoleAttrValue(role);
 
             writer.append("<roleHeads");
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "role", roleName);
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "heads", Integer.toString(heads));
-            writer.append(" />\n");
+            writer.sp();
+            writer.attrOut("role", roleName);
+            writer.sp();
+            writer.attrOut("heads", Integer.toString(heads));
+            writer.append(" />");
+            writer.nl();
         }
         return;
     }
@@ -329,7 +330,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpMurderedElem(Writer writer) throws IOException{
+    public void dumpMurderedElem(XmlOut writer) throws IOException{
         for(AvatarData avatar : this.avatarList){
             dumpAvatarRef(writer, avatar);
         }
@@ -341,7 +342,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpSurvivorElem(Writer writer) throws IOException{
+    public void dumpSurvivorElem(XmlOut writer) throws IOException{
         for(AvatarData avatar : this.avatarList){
             dumpAvatarRef(writer, avatar);
         }
@@ -353,7 +354,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpNoCommentElem(Writer writer) throws IOException{
+    public void dumpNoCommentElem(XmlOut writer) throws IOException{
         for(AvatarData avatar : this.avatarList){
             dumpAvatarRef(writer, avatar);
         }
@@ -365,18 +366,19 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpCountingElem(Writer writer) throws IOException{
+    public void dumpCountingElem(XmlOut writer) throws IOException{
         int total = this.avatarList.size();
         total = total / 2 * 2;
         for(int index = 0; index < total; index += 2){
             AvatarData voteBy = this.avatarList.get(index);
             AvatarData voteTo = this.avatarList.get(index + 1);
             writer.append("<vote");
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "byWhom", voteBy.getAvatarId());
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "target", voteTo.getAvatarId());
-            writer.append(" />\n");
+            writer.sp();
+            writer.attrOut("byWhom", voteBy.getAvatarId());
+            writer.sp();
+            writer.attrOut("target", voteTo.getAvatarId());
+            writer.append(" />");
+            writer.nl();
         }
         return;
     }
@@ -386,17 +388,18 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpExecutionElem(Writer writer) throws IOException{
+    public void dumpExecutionElem(XmlOut writer) throws IOException{
         int total = this.intList.size();
         for(int index = 0; index < total; index++){
             AvatarData voteTo = this.avatarList.get(index);
             int count = this.intList.get(index);
             writer.append("<nominated");
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "avatarId", voteTo.getAvatarId());
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "count", "" + count);
-            writer.append(" />\n");
+            writer.sp();
+            writer.attrOut("avatarId", voteTo.getAvatarId());
+            writer.sp();
+            writer.attrOut("count", "" + count);
+            writer.append(" />");
+            writer.nl();
         }
         return;
     }
@@ -406,7 +409,7 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpPlayerlistElem(Writer writer) throws IOException{
+    public void dumpPlayerlistElem(XmlOut writer) throws IOException{
         int num = this.avatarList.size();
 
         for(int index = 0; index < num; index++){
@@ -421,25 +424,26 @@ public class EventData extends TopicData{
             String roleName = getRoleAttrValue(role);
 
             writer.append("<playerInfo");
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "playerId", account.toString());
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "avatarId", avatar.getAvatarId());
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "survive", survive);
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "role", roleName);
+            writer.sp();
+            writer.attrOut("playerId", account.toString());
+            writer.sp();
+            writer.attrOut("avatarId", avatar.getAvatarId());
+            writer.sp();
+            writer.attrOut("survive", survive);
+            writer.sp();
+            writer.attrOut("role", roleName);
 
             String uriStr = uri.toString();
             uriStr = uriStr.replaceAll("^[\\s]+", "");
             uriStr = uriStr.replaceAll("[\\s]+$", "");
             uriStr = uriStr.replaceAll("[\\s]+", "\u0020");
             if(uriStr.length() > 0){
-                writer.append(' ');
-                XmlUtils.attrOut(writer, "uri", uriStr);
+                writer.sp();
+                writer.attrOut("uri", uriStr);
             }
 
-            writer.append(" />\n");
+            writer.append(" />");
+            writer.nl();
         }
 
         return;
@@ -450,14 +454,14 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpByWhomAttr(Writer writer) throws IOException{
+    public void dumpByWhomAttr(XmlOut writer) throws IOException{
         AvatarData by = this.avatarList.get(0);
         AvatarData to = this.avatarList.get(1);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "byWhom", by.getAvatarId());
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "target", to.getAvatarId());
+        writer.sp();
+        writer.attrOut("byWhom", by.getAvatarId());
+        writer.sp();
+        writer.attrOut("target", to.getAvatarId());
 
         return;
     }
@@ -467,33 +471,33 @@ public class EventData extends TopicData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpAssaultAttr(Writer writer) throws IOException{
+    public void dumpAssaultAttr(XmlOut writer) throws IOException{
         AvatarData by = this.avatarList.get(0);
         AvatarData to = this.avatarList.get(1);
 
-        writer.append('\n');
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "byWhom", by.getAvatarId());
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "target", to.getAvatarId());
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("byWhom", by.getAvatarId());
+        writer.sp();
+        writer.attrOut("target", to.getAvatarId());
+        writer.nl();
 
         DecodedContent xname = this.strList.get(0);
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "xname", xname);
+        writer.indent(1);
+        writer.attrOut("xname", xname);
 
         int hour = this.intList.get(0);
         int minute = this.intList.get(1);
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "time", hour, minute);
-        writer.append('\n');
+        writer.sp();
+        writer.timeAttrOut("time", hour, minute);
+        writer.nl();
 
         String icon = this.strList.get(1).toString();
         if( ! icon.equals(by.getFaceIconUri()) ){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer, "faceIconURI", icon);
-            writer.append('\n');
+            writer.indent(1);
+            writer.attrOut("faceIconURI", icon);
+            writer.nl();
         }
 
         return;
@@ -505,7 +509,7 @@ public class EventData extends TopicData{
      * @throws IOException 出力エラー
      */
     @Override
-    public void dumpXml(Writer writer) throws IOException{
+    public void dumpXml(XmlOut writer) throws IOException{
         String tagName = getTagName(this.eventType);
 
         writer.append("<");
@@ -548,8 +552,9 @@ public class EventData extends TopicData{
             break;
         }
 
-        if(hasAttr) writer.append(' ');
-        writer.append(">\n");
+        if(hasAttr) writer.sp();
+        writer.append(">");
+        writer.nl();
 
         dumpLines(writer);
 
@@ -582,7 +587,8 @@ public class EventData extends TopicData{
 
         writer.append("</");
         writer.append(tagName);
-        writer.append(">\n");
+        writer.append(">");
+        writer.nl();
 
         return;
     }

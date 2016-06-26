@@ -8,7 +8,6 @@
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -157,29 +156,30 @@ public class AvatarData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpXml(Writer writer) throws IOException{
-        writer.append("<avatar\n");
+    public void dumpXml(XmlOut writer) throws IOException{
+        writer.append("<avatar");
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "avatarId", this.avatarId);
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("avatarId", this.avatarId);
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "fullName", this.fullName);
+        writer.indent(1);
+        writer.attrOut("fullName", this.fullName);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "shortName", this.shortName);
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("shortName", this.shortName);
+        writer.nl();
 
         if(this.faceIconUri != null){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer, "faceIconURI", this.faceIconUri);
-            writer.append('\n');
+            writer.indent(1);
+            writer.attrOut("faceIconURI", this.faceIconUri);
+            writer.nl();
             // F1014対策
         }
 
-        writer.append("/>\n");
-        writer.flush();
+        writer.append("/>");
+        writer.nl();
 
         return;
     }

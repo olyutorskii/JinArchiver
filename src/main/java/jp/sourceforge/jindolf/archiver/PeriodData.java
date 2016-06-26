@@ -8,7 +8,6 @@
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -166,8 +165,8 @@ public class PeriodData{
         if(topicData instanceof EventData){
             EventData event = (EventData) topicData;
             SysEventType type = event.getEventType();
-            if(   type == SysEventType.MURDERED
-               || type == SysEventType.NOMURDER){
+            if(    type == SysEventType.MURDERED
+                || type == SysEventType.NOMURDER){
                 this.hasMurderResult = true;
             }
         }
@@ -180,8 +179,9 @@ public class PeriodData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpXml(Writer writer) throws IOException{
-        writer.append("<period\n");
+    public void dumpXml(XmlOut writer) throws IOException{
+        writer.append("<period");
+        writer.nl();
 
         String ptype;
         switch(this.resource.getPeriodType()){
@@ -198,58 +198,57 @@ public class PeriodData{
             throw new IllegalArgumentException();
         }
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "type", ptype);
+        writer.indent(1);
+        writer.attrOut("type", ptype);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer,
-                "day", Integer.toString(this.resource.getDay()));
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("day", Integer.toString(this.resource.getDay()));
+        writer.nl();
 
         if(this.disclosureType != DisclosureType.COMPLETE){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer,
-                    "disclosure", this.disclosureType.getXmlName());
-            writer.append('\n');
+            writer.indent(1);
+            writer.attrOut("disclosure", this.disclosureType.getXmlName());
+            writer.nl();
         }
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.dateAttrOut(writer, "nextCommitDay",
-                             this.commitMonth, this.commitDay);
+        writer.indent(1);
+        writer.dateAttrOut("nextCommitDay",
+                           this.commitMonth, this.commitDay);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer,
-                             "commitTime",
-                             this.commitHour, this.commitMinute);
-        writer.append('\n');
+        writer.sp();
+        writer.timeAttrOut("commitTime",
+                           this.commitHour, this.commitMinute);
+        writer.nl();
 
         URI baseUri   = URI.create(this.parent.getBaseUri());
         URI periodUri = URI.create(this.resource.getOrigUrlText());
         URI relativeUri = baseUri.relativize(periodUri);
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "sourceURI", relativeUri.toString());
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("sourceURI", relativeUri.toString());
+        writer.nl();
 
         long downTimeMs = this.resource.getDownTimeMs();
-        XmlUtils.indent(writer, 1);
-        XmlUtils.dateTimeAttr(writer, "loadedTime", downTimeMs);
-        writer.append('\n');
+        writer.indent(1);
+        writer.dateTimeAttr("loadedTime", downTimeMs);
+        writer.nl();
 
         if(this.loginName.length() > 0){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer, "loadedBy", this.loginName.toString());
-            writer.append('\n');
+            writer.indent(1);
+            writer.attrOut("loadedBy", this.loginName.toString());
+            writer.nl();
         }
 
-        writer.append(">\n\n");
+        writer.append(">");
+        writer.nl();
+        writer.nl();
 
         for(TopicData topic : this.topicList){
             topic.dumpXml(writer);
-            writer.append('\n');
-            writer.flush();
+            writer.nl();
         }
 
-        writer.append("</period>\n");
+        writer.append("</period>");
+        writer.nl();
 
         return;
     }

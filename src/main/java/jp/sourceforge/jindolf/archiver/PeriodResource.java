@@ -59,7 +59,7 @@ public class PeriodResource{
      * @return 国情報
      */
     public LandDef getLandDef(){
-        return landDef;
+        return this.landDef;
     }
 
     /**
@@ -67,7 +67,7 @@ public class PeriodResource{
      * @return 村番号
      */
     public int getVillageId(){
-        return villageId;
+        return this.villageId;
     }
 
     /**
@@ -75,7 +75,7 @@ public class PeriodResource{
      * @return Period種別
      */
     public PeriodType getPeriodType(){
-        return periodType;
+        return this.periodType;
     }
 
     /**
@@ -83,7 +83,7 @@ public class PeriodResource{
      * @return 日付
      */
     public int getDay(){
-        return day;
+        return this.day;
     }
 
     /**
@@ -91,7 +91,7 @@ public class PeriodResource{
      * @return ダウンロード元URL文字列
      */
     public String getOrigUrlText(){
-        return origUrlText;
+        return this.origUrlText;
     }
 
     /**
@@ -116,7 +116,7 @@ public class PeriodResource{
      * @return 格納先URL
      */
     public URL getResourceUrl(){
-        return resourceUrl;
+        return this.resourceUrl;
     }
 
     /**

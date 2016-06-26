@@ -18,6 +18,9 @@ import java.io.Writer;
  */
 public class SnifWriter extends Writer{
 
+    private static final int SZ_PIPEREAD = 8 * 1024;
+
+
     private final Writer fout;
 
     private final Writer pout;
@@ -35,7 +38,7 @@ public class SnifWriter extends Writer{
         this.fout = writer;
 
         PipedWriter pipeOut = new PipedWriter();
-        PipedReader pipeIn  = new PipedReader();
+        PipedReader pipeIn  = new PipedReader(SZ_PIPEREAD);
 
         try{
             pipeOut.connect(pipeIn);

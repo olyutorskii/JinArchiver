@@ -21,7 +21,7 @@ public class DumpXmlTask implements Callable<Void> {
 
 
     private final VillageData villageData;
-    private final Writer writer;
+    private final XmlOut writer;
 
 
     /**
@@ -32,7 +32,7 @@ public class DumpXmlTask implements Callable<Void> {
     public DumpXmlTask(VillageData villageData, Writer writer){
         super();
         this.villageData = villageData;
-        this.writer = writer;
+        this.writer = new XmlOut(writer);
         return;
     }
 
@@ -58,7 +58,7 @@ public class DumpXmlTask implements Callable<Void> {
     @Override
     public Void call() throws IOException{
         try{
-            XmlUtils.dumpVillageData(this.writer, this.villageData);
+            this.writer.dumpVillageData(this.villageData);
         }finally{
             this.writer.close();
         }

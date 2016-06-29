@@ -1,0 +1,337 @@
+<!--
+
+人狼BBS 共通アーカイブ基盤用 DTD定義
+
+by olyutorskii [ http://sourceforge.jp/users/olyutorskii/ ]
+License : The MIT License
+※ カタログ化はご自由に
+
+Copyright(c) 2009 olyutorskii
+
+-->
+
+<!ENTITY % announceElems "
+  startEntry
+| onStage
+| startMirror
+| openRole
+| murdered
+| startAssault
+| survivor
+| counting
+| suddenDeath
+| noMurder
+| winVillage
+| winWolf
+| winHamster
+| playerList
+| panic
+| execution
+| vanish
+| checkout
+| shortMember
+" >
+
+<!ENTITY % orderElems "
+  askEntry
+| askCommit
+| noComment
+| stayEpilogue
+| gameOver
+" >
+
+<!ENTITY % extraElems "
+  judge
+| guard
+| counting2
+| assault
+" >
+
+<!ENTITY % systemEvent " %announceElems; | %orderElems; | %extraElems; " >
+
+<!ENTITY % EventFamily " announce | order | extra " >
+<!ENTITY % announceAttrs "eventFamily (%EventFamily;) #FIXED 'announce'" >
+<!ENTITY % orderAttrs    "eventFamily (%EventFamily;) #FIXED 'order'" >
+<!ENTITY % extraAttrs    "eventFamily (%EventFamily;) #FIXED 'extra'" >
+
+<!ENTITY % VillageState " prologue | progress | epilogue | gameover " >
+<!ENTITY % DisclosureType " hot | uncomplete | complete " >
+<!ENTITY % PeriodType " prologue | progress | epilogue " >
+<!ENTITY % Team " village | wolf | hamster " >
+<!ENTITY % TalkType " public | wolf | private| grave " >
+<!ENTITY % Role "
+  innocent
+| wolf
+| seer
+| shaman
+| madman
+| hunter
+| frater
+| hamster
+" >
+
+
+<!-- #################################################################### -->
+
+
+<!ELEMENT village (avatarList, period*) >
+<!ATTLIST village
+    xmlns CDATA #REQUIRED
+    xmlns:xsi CDATA #REQUIRED
+    xsi:schemaLocation CDATA #REQUIRED
+    xml:lang CDATA "ja-JP"
+    xml:base CDATA #REQUIRED
+    xml:space (default|preserve) "preserve"
+    fullName CDATA #REQUIRED
+    vid CDATA #REQUIRED
+    commitTime CDATA #IMPLIED
+    state (%VillageState;) #REQUIRED
+    disclosure (%DisclosureType;) "complete"
+    isValid ( true | false | 1 | 0 ) "true"
+    landName CDATA #REQUIRED
+    formalName CDATA #REQUIRED
+    landId CDATA #REQUIRED
+    landPrefix CDATA #REQUIRED
+    locale CDATA "ja-JP"
+    origencoding CDATA "Shift_JIS"
+    timezone CDATA "GMT+09:00"
+    graveIconURI CDATA #REQUIRED
+    generator CDATA #IMPLIED
+>
+
+<!ELEMENT avatarList (avatar*) >
+
+<!ELEMENT avatar EMPTY >
+<!ATTLIST avatar
+    avatarId CDATA #REQUIRED
+    fullName CDATA #REQUIRED
+    shortName CDATA #REQUIRED
+    faceIconURI CDATA #IMPLIED
+>
+
+<!ELEMENT period ( talk | %systemEvent; )* >
+<!ATTLIST period
+    type (%PeriodType;) #REQUIRED
+    day CDATA #REQUIRED
+    disclosure (%DisclosureType;) "complete"
+    nextCommitDay CDATA #REQUIRED
+    commitTime CDATA #REQUIRED
+    sourceURI CDATA #REQUIRED
+    loadedTime CDATA #IMPLIED
+    loadedBy CDATA #IMPLIED
+>
+
+<!ELEMENT talk (li)* >
+<!ATTLIST talk
+    type (%TalkType;) #REQUIRED
+    avatarId CDATA #REQUIRED
+    xname CDATA #REQUIRED
+    time CDATA #REQUIRED
+    faceIconURI CDATA #IMPLIED
+>
+
+<!ELEMENT li (#PCDATA|rawdata)* >
+<!ATTLIST li xml:space (default|preserve) "preserve" >
+
+<!ELEMENT rawdata (#PCDATA) >
+<!ATTLIST rawdata
+    encoding CDATA #REQUIRED
+    hexBin   CDATA #REQUIRED
+>
+
+<!ELEMENT avatarRef EMPTY >
+<!ATTLIST avatarRef
+    avatarId CDATA #REQUIRED
+>
+
+<!ELEMENT startEntry (li)* >
+<!ATTLIST startEntry
+    %announceAttrs;
+>
+
+<!ELEMENT onStage (li)* >
+<!ATTLIST onStage
+    %announceAttrs;
+    entryNo CDATA #REQUIRED
+    avatarId CDATA #REQUIRED
+>
+
+<!ELEMENT startMirror (li)* >
+<!ATTLIST startMirror
+    %announceAttrs;
+>
+
+<!ELEMENT roleHeads EMPTY >
+<!ATTLIST roleHeads
+    role (%Role;) #REQUIRED
+    heads CDATA #REQUIRED
+>
+
+<!ELEMENT openRole (li*, roleHeads+) >
+<!ATTLIST openRole
+    %announceAttrs;
+>
+
+<!ELEMENT murdered (li*, avatarRef+) >
+<!ATTLIST murdered
+    %announceAttrs;
+>
+
+<!ELEMENT startAssault (li)* >
+<!ATTLIST startAssault
+    %announceAttrs;
+>
+
+<!ELEMENT survivor (li*, avatarRef+) >
+<!ATTLIST survivor
+    %announceAttrs;
+>
+
+<!ELEMENT vote EMPTY >
+<!ATTLIST vote
+    byWhom CDATA #REQUIRED
+    target CDATA #REQUIRED
+>
+
+<!ELEMENT counting (li*, vote+) >
+<!ATTLIST counting
+    %announceAttrs;
+    victim CDATA #IMPLIED
+>
+
+<!ELEMENT suddenDeath (li)* >
+<!ATTLIST suddenDeath
+    %announceAttrs;
+    avatarId CDATA #REQUIRED
+>
+
+<!ELEMENT noMurder (li)* >
+<!ATTLIST noMurder
+    %announceAttrs;
+>
+
+<!ELEMENT winVillage (li)* >
+<!ATTLIST winVillage
+    %announceAttrs;
+>
+
+<!ELEMENT winWolf (li)* >
+<!ATTLIST winWolf
+    %announceAttrs;
+>
+
+<!ELEMENT winHamster (li)* >
+<!ATTLIST winHamster
+    %announceAttrs;
+>
+
+<!ELEMENT playerInfo EMPTY >
+<!ATTLIST playerInfo
+    playerId CDATA #REQUIRED
+    avatarId CDATA #REQUIRED
+    survive ( true | false | 1 | 0 ) #REQUIRED
+    role (%Role;) #REQUIRED
+    uri CDATA #IMPLIED
+>
+
+<!ELEMENT playerList (li*, playerInfo+) >
+<!ATTLIST playerList
+    %announceAttrs;
+>
+
+<!ELEMENT panic (li)* >
+<!ATTLIST panic
+    %announceAttrs;
+>
+
+<!ELEMENT nominated EMPTY >
+<!ATTLIST nominated
+    avatarId CDATA #REQUIRED
+    count CDATA #REQUIRED
+>
+
+<!ELEMENT execution (li*, nominated+) >
+<!ATTLIST execution
+    %announceAttrs;
+    victim CDATA #IMPLIED
+>
+
+<!ELEMENT vanish (li)* >
+<!ATTLIST vanish
+    %announceAttrs;
+    avatarId CDATA #REQUIRED
+>
+
+<!ELEMENT checkout (li)* >
+<!ATTLIST checkout
+    %announceAttrs;
+    avatarId CDATA #REQUIRED
+>
+
+<!ELEMENT shortMember (li)* >
+<!ATTLIST shortMember
+    %announceAttrs;
+>
+
+<!ELEMENT askEntry (li)* >
+<!ATTLIST askEntry
+    %orderAttrs;
+    commitTime CDATA #REQUIRED
+    minMembers CDATA #REQUIRED
+    maxMembers CDATA #REQUIRED
+>
+
+<!ELEMENT askCommit (li)* >
+<!ATTLIST askCommit
+    %orderAttrs;
+    limitVote CDATA #REQUIRED
+    limitSpecial CDATA #REQUIRED
+>
+
+<!ELEMENT noComment (li*, avatarRef+) >
+<!ATTLIST noComment
+    %orderAttrs;
+>
+
+<!ELEMENT stayEpilogue (li)* >
+<!ATTLIST stayEpilogue
+    %orderAttrs;
+    winner (%Team;) #REQUIRED
+    limitTime CDATA #REQUIRED
+>
+
+<!ELEMENT gameOver (li)* >
+<!ATTLIST gameOver
+    %orderAttrs;
+>
+
+<!ELEMENT judge (li)* >
+<!ATTLIST judge
+    %extraAttrs;
+    byWhom CDATA #REQUIRED
+    target CDATA #REQUIRED
+>
+
+<!ELEMENT guard (li)* >
+<!ATTLIST guard
+    %extraAttrs;
+    byWhom CDATA #REQUIRED
+    target CDATA #REQUIRED
+>
+
+<!ELEMENT counting2 (li*, vote+) >
+<!ATTLIST counting2
+    %extraAttrs;
+>
+
+<!ELEMENT assault (li)* >
+<!ATTLIST assault
+    %extraAttrs;
+    byWhom CDATA #REQUIRED
+    target CDATA #REQUIRED
+    xname CDATA #REQUIRED
+    time CDATA #REQUIRED
+    faceIconURI CDATA #IMPLIED
+>
+
+<!-- EOF -->

@@ -26,6 +26,7 @@ import javax.xml.validation.Validator;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 /**
@@ -170,6 +171,9 @@ public final class JinArchiver{
             abortWithException(e, "処理を続行できません。");
             return;
         }
+
+        LSResourceResolver resolver = new XmlResolver();
+        validator.setResourceResolver(resolver);
 
         Writer writer;
         if(outdir != null){

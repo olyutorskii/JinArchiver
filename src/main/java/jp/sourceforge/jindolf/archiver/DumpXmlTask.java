@@ -8,7 +8,6 @@
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.concurrent.Callable;
 
 /**
@@ -29,10 +28,10 @@ public class DumpXmlTask implements Callable<Void> {
      * @param villageData 村情報
      * @param writer 出力先
      */
-    public DumpXmlTask(VillageData villageData, Writer writer){
+    public DumpXmlTask(VillageData villageData, XmlOut writer){
         super();
         this.villageData = villageData;
-        this.writer = new XmlOut(writer);
+        this.writer = writer;
         return;
     }
 

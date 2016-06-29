@@ -11,6 +11,7 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -54,8 +55,18 @@ public class XmlOut implements Appendable, Flushable, Closeable{
     private static final TimeZone TZ_TOKYO =
             TimeZone.getTimeZone("Asia/Tokyo");
 
+    private static final Charset CS_DEF = Charset.forName("Shift_JIS");
+
+    private static final char[] HEX_TABLE = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f',
+    };
+
 
     private final Writer writer;
+
+    private String charsetName;
+    private boolean isShiftJis;
 
 
     /**
@@ -64,7 +75,11 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      */
     XmlOut(Writer writer){
         super();
+
         this.writer = writer;
+
+        setSourceCharsetImpl(CS_DEF);
+
         return;
     }
 
@@ -93,6 +108,8 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      *
      * <p>サロゲートペアのシーケンスまでは調べない。
      *
+     * <p>XML規格2.2 Char 定義を参照せよ。
+     *
      * @param chVal 文字
      * @return 出現可能ならtrue
      */
@@ -112,7 +129,7 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      *
      * <p>ControlPicturesが利用できない場合はU+FFFDを用いる。
      *
-     * <p>UnicodeのControl Picturesブロックを参照せよ。
+     * <p>Unicode規格のControl Picturesブロックを参照せよ。
      *
      * @param chVal 対象文字
      * @return 代替キャラクタ
@@ -131,6 +148,99 @@ public class XmlOut implements Appendable, Flushable, Closeable{
         return result;
     }
 
+    /**
+     * byte値を2桁の16進文字列表記に変換する。
+     * @param bVal byte値
+     * @return 16進文字列
+     */
+    public static String toHex(byte bVal){
+        int hexVal = bVal & 0xff;
+
+        char ch1 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch0 = HEX_TABLE[hexVal & 0x0f];
+
+        StringBuilder txt = new StringBuilder();
+        txt.append(ch0);
+        txt.append(ch1);
+
+        return txt.toString();
+    }
+
+    /**
+     * char値を2桁または4桁の16進文字列表記に変換する。
+     *
+     * <p>U+00FFより大きな値は4桁出力となる。
+     *
+     * @param cVal char値
+     * @return 16進文字列
+     */
+    public static String toHex(char cVal){
+        int hexVal = cVal & 0xffff;
+
+        char ch3 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch2 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch1 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch0 = HEX_TABLE[hexVal & 0x0f];
+
+        StringBuilder txt = new StringBuilder();
+        if(cVal > '\u00ff'){
+            txt.append(ch0);
+            txt.append(ch1);
+        }
+        txt.append(ch2);
+        txt.append(ch3);
+
+        return txt.toString();
+    }
+
+    /**
+     * short値を4桁の16進文字列表記に変換する。
+     * @param sVal short値
+     * @return 16進文字列
+     */
+    public static String toHex(short sVal){
+        int hexVal = sVal & 0xffff;
+
+        char ch3 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch2 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch1 = HEX_TABLE[hexVal & 0x0f];
+        hexVal >>= 4;
+        char ch0 = HEX_TABLE[hexVal & 0x0f];
+
+        StringBuilder txt = new StringBuilder();
+        txt.append(ch0);
+        txt.append(ch1);
+        txt.append(ch2);
+        txt.append(ch3);
+
+        return txt.toString();
+    }
+
+
+    /**
+     * パース元の文字コードを設定する。
+     * @param cs Charset
+     */
+    public void setSourceCharset(Charset cs){
+        setSourceCharsetImpl(cs);
+        return;
+    }
+
+    /**
+     * パース元の文字コードを設定する。
+     * @param cs Charset
+     */
+    private void setSourceCharsetImpl(Charset cs){
+        this.charsetName = cs.name();
+        this.isShiftJis = "Shift_JIS".equals(this.charsetName);
+        return;
+    }
 
     /**
      * {@inheritDoc}
@@ -229,9 +339,7 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      */
     public void charRefOut(char chVal)
             throws IOException{
-        int ival = 0xffff & ((int) chVal);
-        String hex = Integer.toHexString(ival);
-        if(hex.length() % 2 != 0) hex = "0" + hex;
+        String hex = toHex(chVal);
 
         append("&#x");
         append(hex);
@@ -436,25 +544,57 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      */
     public void dumpErrorInfo(DecodeErrorInfo errorInfo)
             throws IOException{
-        int hexVal;
-        hexVal = errorInfo.getRawByte1st() & 0xff;
-        if(errorInfo.has2nd()){
-            hexVal <<= 8;
-            hexVal |= errorInfo.getRawByte2nd() & 0xff;
+        if(this.isShiftJis && errorInfo.has2nd()){
+            byte bVal1 = errorInfo.getRawByte1st();
+            byte bVal2 = errorInfo.getRawByte2nd();
+            dumpSjisMapError(bVal1, bVal2);
+        }else{
+            byte bVal1 = errorInfo.getRawByte1st();
+            dumpDecodeError(bVal1);
+            if(errorInfo.has2nd()){
+                byte bVal2 = errorInfo.getRawByte2nd();
+                dumpDecodeError(bVal2);
+            }
         }
 
-        String hexBin = Integer.toHexString(hexVal);
-        if(hexBin.length() % 2 != 0) hexBin = "0" + hexBin;
 
-        char replaceChar = Win31j.getWin31jChar(errorInfo);
+        return;
+    }
 
+    /**
+     * シフトJISマッピングに関するエラー情報をrawdataタグで出力する。
+     * @param bVal1  エラーデータ1
+     * @param bVal2  エラーデータ2
+     * @throws IOException 出力エラー
+     */
+    public void dumpSjisMapError(byte bVal1, byte bVal2) throws IOException{
+        short hexVal;
+        hexVal = (short) (bVal1 & 0xff);
+        hexVal <<= 8;
+        hexVal |= (short) (bVal2 & 0xff);
+
+        String hexBin = toHex(hexVal);
+
+        char replaceChar = Win31j.getWin31jChar(bVal1, bVal2);
         rawDataOut(hexBin, replaceChar);
 
         return;
     }
 
     /**
-     * 生データ出力
+     * デコードエラー情報をrawdataタグで出力する。
+     * @param bVal エラーデータ
+     * @throws IOException 出力エラー
+     */
+    public void dumpDecodeError(byte bVal) throws IOException{
+        String hexBin = toHex(bVal);
+        char replaceChar = replaceChar((char) (bVal & 0xff));
+        rawDataOut(hexBin, replaceChar);
+        return;
+    }
+
+    /**
+     * 生データ出力。
      * @param hex 16進文字列
      * @param replace 代替キャラクタ
      * @throws IOException 出力エラー
@@ -462,8 +602,9 @@ public class XmlOut implements Appendable, Flushable, Closeable{
     private void rawDataOut(String hex, char replace) throws IOException{
         append("<rawdata");
 
+        String encName = this.charsetName;
         sp();
-        attrOut("encoding", "Shift_JIS");
+        attrOut("encoding", encName);
 
         sp();
         attrOut("hexBin", hex);
@@ -554,15 +695,9 @@ public class XmlOut implements Appendable, Flushable, Closeable{
      */
     public void dumpRawData(char chVal)
             throws IOException{
-        int hexVal;
-        hexVal = chVal & 0xff;
-        String hexBin = Integer.toHexString(hexVal);
-        if(hexBin.length() % 2 != 0) hexBin = "0" + hexBin;
-
+        String hexBin = toHex(chVal);
         char replaceChar = replaceChar(chVal);
-
         rawDataOut(hexBin, replaceChar);
-
         return;
     }
 

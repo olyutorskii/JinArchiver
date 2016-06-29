@@ -277,7 +277,7 @@ public class XmlOutTest {
         xmlOut = new XmlOut(writer);
         xmlOut.dumpRawData('\u0100');
         xmlOut.close();
-        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"00\" >\ufffd</rawdata>", writer.toString());
+        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"0100\" >\ufffd</rawdata>", writer.toString());
 
         return;
     }
@@ -515,11 +515,11 @@ public class XmlOutTest {
     }
 
     /**
-     * Test of dumpErrorInfo method, of class XmlUtils.
+     * Test of dumpSjisMapError method, of class XmlUtils.
      * @throws java.lang.Exception
      */
     @Test
-    public void testDumpErrorInfo() throws Exception {
+    public void testDumpDecodeError() throws Exception {
         System.out.println("dumpErrorInfo");
 
         Writer writer;
@@ -531,21 +531,21 @@ public class XmlOutTest {
         errorInfo = new DecodeErrorInfo(0, (byte) 0x00);
         xmlOut.dumpErrorInfo(errorInfo);
         xmlOut.close();
-        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"00\" >\ufffd</rawdata>", writer.toString());
+        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"00\" >\u2400</rawdata>", writer.toString());
 
         writer = new StringWriter();
         xmlOut = new XmlOut(writer);
         errorInfo = new DecodeErrorInfo(0, (byte) 0x0f);
         xmlOut.dumpErrorInfo(errorInfo);
         xmlOut.close();
-        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"0f\" >\ufffd</rawdata>", writer.toString());
+        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"0f\" >\u240f</rawdata>", writer.toString());
 
         writer = new StringWriter();
         xmlOut = new XmlOut(writer);
         errorInfo = new DecodeErrorInfo(0, (byte) 0x10);
         xmlOut.dumpErrorInfo(errorInfo);
         xmlOut.close();
-        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"10\" >\ufffd</rawdata>", writer.toString());
+        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"10\" >\u2410</rawdata>", writer.toString());
 
         writer = new StringWriter();
         xmlOut = new XmlOut(writer);
@@ -591,7 +591,7 @@ public class XmlOutTest {
         content.append("CD");
         xmlOut.dumpDecodedContent(content);
         xmlOut.close();
-        assertEquals("AB<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\ufffd</rawdata>CD", writer.toString());
+        assertEquals("AB<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\u2408</rawdata>CD", writer.toString());
 
         writer = new StringWriter();
         xmlOut = new XmlOut(writer);
@@ -600,7 +600,7 @@ public class XmlOutTest {
         content.addDecodeError((byte)0x08);
         xmlOut.dumpDecodedContent(content);
         xmlOut.close();
-        assertEquals("AB<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\ufffd</rawdata>", writer.toString());
+        assertEquals("AB<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\u2408</rawdata>", writer.toString());
 
         writer = new StringWriter();
         xmlOut = new XmlOut(writer);
@@ -609,7 +609,171 @@ public class XmlOutTest {
         content.append("CD");
         xmlOut.dumpDecodedContent(content);
         xmlOut.close();
-        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\ufffd</rawdata>CD", writer.toString());
+        assertEquals("<rawdata encoding=\"Shift_JIS\" hexBin=\"08\" >\u2408</rawdata>CD", writer.toString());
+
+        return;
+    }
+
+    /**
+     * Test of isXmlChar method, of class XmlOut.
+     */
+    @Test
+    public void testIsXmlChar() {
+        System.out.println("isXmlChar");
+
+        assertFalse(XmlOut.isXmlChar('\u0000'));
+        assertFalse(XmlOut.isXmlChar('\u001f'));
+
+        assertTrue(XmlOut.isXmlChar('\n'));
+        assertTrue(XmlOut.isXmlChar('\r'));
+        assertTrue(XmlOut.isXmlChar('\t'));
+
+        assertTrue(XmlOut.isXmlChar('\u0020'));
+        assertTrue(XmlOut.isXmlChar('A'));
+        assertTrue(XmlOut.isXmlChar('\ud7ff'));
+
+        assertTrue(XmlOut.isXmlChar('\ud800'));
+        assertTrue(XmlOut.isXmlChar('\udbff'));
+
+        assertTrue(XmlOut.isXmlChar('\udc00'));
+        assertTrue(XmlOut.isXmlChar('\udfff'));
+
+        assertTrue(XmlOut.isXmlChar('\ue000'));
+        assertTrue(XmlOut.isXmlChar('\ufffd'));
+
+        assertFalse(XmlOut.isXmlChar('\ufffe'));
+        assertFalse(XmlOut.isXmlChar('\uffff'));
+
+        return;
+    }
+
+    /**
+     * Test of replaceChar method, of class XmlOut.
+     */
+    @Test
+    public void testReplaceChar() {
+        System.out.println("replaceChar");
+
+        char result;
+
+        result = XmlOut.replaceChar('\u0000');
+        assertEquals('\u2400', result);
+
+        result = XmlOut.replaceChar('\u001f');
+        assertEquals('\u241f', result);
+
+        result = XmlOut.replaceChar('\u007f');
+        assertEquals('\u2421', result);
+
+        result = XmlOut.replaceChar('A');
+        assertEquals('\ufffd', result);
+
+        return;
+    }
+
+    /**
+     * Test of toHex method, of class XmlOut.
+     */
+    @Test
+    public void testToHex_byte() {
+        System.out.println("toHex");
+
+        byte bVal;
+        String result;
+
+        bVal = 0x00;
+        result = XmlOut.toHex(bVal);
+        assertEquals("00", result);
+
+        bVal = 0x0a;
+        result = XmlOut.toHex(bVal);
+        assertEquals("0a", result);
+
+        bVal = 0x7f;
+        result = XmlOut.toHex(bVal);
+        assertEquals("7f", result);
+
+        bVal = (byte) 0x80;
+        result = XmlOut.toHex(bVal);
+        assertEquals("80", result);
+
+        bVal = (byte) 0xff;
+        result = XmlOut.toHex(bVal);
+        assertEquals("ff", result);
+
+        return;
+    }
+
+    /**
+     * Test of toHex method, of class XmlOut.
+     */
+    @Test
+    public void testToHex_char() {
+        System.out.println("toHex");
+
+        char cVal;
+        String result;
+
+        cVal = '\u0000';
+        result = XmlOut.toHex(cVal);
+        assertEquals("00", result);
+
+        cVal = '\u000b';
+        result = XmlOut.toHex(cVal);
+        assertEquals("0b", result);
+
+        cVal = '\u00ff';
+        result = XmlOut.toHex(cVal);
+        assertEquals("ff", result);
+
+        cVal = '\u0100';
+        result = XmlOut.toHex(cVal);
+        assertEquals("0100", result);
+
+        cVal = '\u7fff';
+        result = XmlOut.toHex(cVal);
+        assertEquals("7fff", result);
+
+        cVal = '\u8000';
+        result = XmlOut.toHex(cVal);
+        assertEquals("8000", result);
+
+        cVal = '\uffff';
+        result = XmlOut.toHex(cVal);
+        assertEquals("ffff", result);
+
+        return;
+    }
+
+    /**
+     * Test of toHex method, of class XmlOut.
+     */
+    @Test
+    public void testToHex_short() {
+        System.out.println("toHex");
+
+        short sVal;
+        String result;
+
+        sVal = 0x0000;
+        result = XmlOut.toHex(sVal);
+        assertEquals("0000", result);
+
+        sVal = 0x00ff;
+        result = XmlOut.toHex(sVal);
+        assertEquals("00ff", result);
+
+        sVal = 0x7fff;
+        result = XmlOut.toHex(sVal);
+        assertEquals("7fff", result);
+
+        sVal = (short) 0x8000;
+        result = XmlOut.toHex(sVal);
+        assertEquals("8000", result);
+
+        sVal = (short) 0xffff;
+        result = XmlOut.toHex(sVal);
+        assertEquals("ffff", result);
 
         return;
     }

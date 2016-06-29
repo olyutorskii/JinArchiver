@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
@@ -158,23 +159,9 @@ public final class JinArchiver{
      * @param optInfo オプション情報
      */
     private static void dumpOut(OptInfo optInfo){
-
         String outdir   = optInfo.getOutdir();
         LandDef landDef = optInfo.getLandDef();
         int vid         = optInfo.getVid();
-
-        Writer writer;
-        if(outdir != null){
-            writer = getFileWriter(outdir, landDef, vid);
-        }else{
-            writer = getStdOutWriter();
-        }
-
-        SnifWriter snifWriter = new SnifWriter(writer);
-        Reader reader = snifWriter.getSnifReader();
-
-        writer = new BufferedWriter(snifWriter);
-        reader = new BufferedReader(reader);
 
         Validator validator;
         try{
@@ -182,6 +169,13 @@ public final class JinArchiver{
         }catch(SAXException e){
             abortWithException(e, "処理を続行できません。");
             return;
+        }
+
+        Writer writer;
+        if(outdir != null){
+            writer = getFileWriter(outdir, landDef, vid);
+        }else{
+            writer = getStdOutWriter();
         }
 
         VillageData villageData;
@@ -198,8 +192,18 @@ public final class JinArchiver{
             return;
         }
 
+        SnifWriter snifWriter = new SnifWriter(writer);
+        Reader reader = snifWriter.getSnifReader();
+
+        writer = new BufferedWriter(snifWriter);
+        reader = new BufferedReader(reader);
+
+        XmlOut xmlOut = new XmlOut(writer);
+        Charset cs = landDef.getEncoding();
+        xmlOut.setSourceCharset(cs);
+
         ValidateTask valTask = new ValidateTask(reader, validator);
-        DumpXmlTask dumpTask = new DumpXmlTask(villageData, writer);
+        DumpXmlTask dumpTask = new DumpXmlTask(villageData, xmlOut);
 
         ProdCons taskman = new ProdCons(dumpTask, valTask);
         try{

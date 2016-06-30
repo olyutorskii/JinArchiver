@@ -726,7 +726,7 @@ public class XmlOut implements Appendable, Flushable, Closeable{
         nl();
 
         indent(1);
-        append("http://jindolf.sourceforge.jp/");
+        append("http://jindolf.osdn.jp/");
         nl();
 
         append("-->");

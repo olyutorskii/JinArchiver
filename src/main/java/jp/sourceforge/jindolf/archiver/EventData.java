@@ -30,9 +30,8 @@ public class EventData extends TopicData{
 
     /**
      * コンストラクタ。
-     * @param periodData 所属元Period
      */
-    public EventData(PeriodData periodData){
+    public EventData(){
         super();
         return;
     }

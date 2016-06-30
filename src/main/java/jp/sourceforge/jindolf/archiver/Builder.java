@@ -34,8 +34,8 @@ public final class Builder{
      * 隠れコンストラクタ。
      */
     private Builder(){
-        super();
-        return;
+        assert false;
+        throw new AssertionError();
     }
 
 
@@ -53,10 +53,11 @@ public final class Builder{
         StreamDecoder decoder;
         ContentBuilder builder;
 
-        if(charset.name().equalsIgnoreCase("Shift_JIS")){
+        String name = charset.name();
+        if("Shift_JIS".equalsIgnoreCase(name)){
             decoder = new SjisDecoder();
             builder = new ContentBuilderSJ(BUF_SZ);
-        }else if(charset.name().equalsIgnoreCase("UTF-8")){
+        }else if("UTF-8".equalsIgnoreCase(name)){
             decoder = new StreamDecoder(charset.newDecoder());
             builder = new ContentBuilderUCS2(BUF_SZ);
         }else{
@@ -99,14 +100,17 @@ public final class Builder{
             if(url == null){
                 url = new URL(resource.getOrigUrlText());
             }
+
+            DecodedContent content;
             URLConnection conn = url.openConnection();
-            InputStream istream = conn.getInputStream();
-            if(resource.getDownTimeMs() <= 0){
-                long downTimeMs = conn.getDate();
-                resource.setDownTimeMs(downTimeMs);
+            try(InputStream istream = conn.getInputStream()){//;
+                if(resource.getDownTimeMs() <= 0){
+                    long downTimeMs = conn.getDate();
+                    resource.setDownTimeMs(downTimeMs);
+                }
+                content = contentFromStream(charset, istream);
             }
-            DecodedContent content = contentFromStream(charset, istream);
-            istream.close();
+
             parser.parseAutomatic(content);
         }
 

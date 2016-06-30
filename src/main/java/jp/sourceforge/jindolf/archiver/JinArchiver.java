@@ -11,6 +11,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,6 @@ import javax.xml.validation.Validator;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.parser.DecodeException;
 import jp.sourceforge.jindolf.parser.HtmlParseException;
-import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 /**
@@ -48,6 +48,11 @@ public final class JinArchiver{
 
     /** バージョン定義リソース。 */
     private static final String RES_VERDEF = "resources/version.properties";
+
+    private static final String FORM_FILENAME =
+            "jin_{0}_{1,number,#00000}.xml";
+
+    private static final Charset CS_UTF8 = Charset.forName("UTF-8");
 
 
     static{
@@ -79,16 +84,11 @@ public final class JinArchiver{
     private static Properties loadVersionDefinition(Class<?> klass){
         Properties result = new Properties();
 
-        InputStream istream = klass.getResourceAsStream(RES_VERDEF);
-
-        try{
-            try{
-                result.load(istream);
-            }finally{
-                istream.close();
-            }
+        try(InputStream istream = klass.getResourceAsStream(RES_VERDEF)){
+            result.load(istream);
         }catch(IOException e){
             // NOTHING
+            assert true;
         }
 
         return result;
@@ -171,9 +171,6 @@ public final class JinArchiver{
             abortWithException(e, "処理を続行できません。");
             return;
         }
-
-        LSResourceResolver resolver = new XmlResolver();
-        validator.setResourceResolver(resolver);
 
         Writer writer;
         if(outdir != null){
@@ -289,6 +286,55 @@ public final class JinArchiver{
     }
 
     /**
+     * 出力ディレクトリの検査。
+     * @param outFile 出力ディレクトリ
+     */
+    private static void probeOutDirectory(File outFile){
+        String errMsg = null;
+
+        if( ! outFile.exists() ){
+            errMsg = outFile.toString() + " が存在しません。";
+        }else if( ! outFile.isDirectory() ){
+            errMsg = outFile.toString() + " はディレクトリではありません。";
+        }else if( ! outFile.canWrite() ){
+            errMsg = outFile.toString() + " に書き込めません。";
+        }
+
+        if(errMsg != null){
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+        }
+
+        return;
+    }
+
+    /**
+     * 出力ファイルを生成する。
+     * @param file 出力ファイル
+     */
+    private static void createFile(File file){
+        String errMsg = null;
+
+        try{
+            boolean created = file.createNewFile();
+            if( ! created ){
+                errMsg = file.getName() + " が既に存在します。";
+            }
+        }catch(IOException e){
+            errMsg = file.getName() + " が作成できません。";
+        }
+
+        if(errMsg != null){
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+        }
+
+        return;
+    }
+
+    /**
      * ローカルファイルへの出力先を得る。
      * @param outdir 出力ディレクトリ
      * @param landDef 国情報
@@ -299,60 +345,36 @@ public final class JinArchiver{
                                          LandDef landDef,
                                          int vid ){
         File outFile = new File(outdir);
-        if( ! outFile.exists() ){
-            errprintln(
-                    outdir + " が存在しません。");
-            exit(1);
-            return null;
-        }
-        if( ! outFile.isDirectory() ){
-            errprintln(
-                    outdir + " はディレクトリではありません。");
-            exit(1);
-            return null;
-        }
-        if( ! outFile.canWrite() ){
-            errprintln(
-                    outdir + " に書き込めません。");
-            exit(1);
-            return null;
-        }
-        String fname = MessageFormat.format(
-            "jin_{0}_{1,number,#00000}.xml", landDef.getLandId(), vid);
+        probeOutDirectory(outFile);
+
+        String fname =
+                MessageFormat.format(
+                        FORM_FILENAME, landDef.getLandId(), vid
+                );
         File xmlFile = new File(outFile, fname);
-        boolean created;
-        try{
-            created = xmlFile.createNewFile();
-        }catch(IOException e){
-            errprintln(
-                    xmlFile.getName() + " が作成できません。");
-            exit(1);
-            return null;
-        }
-        if( ! created ){
-            errprintln(
-                    fname + " が既に" + outdir + "に存在します。");
-            exit(1);
-            return null;
-        }
+
+        createFile(xmlFile);
+
         /* JRE 1.6 only
         xmlFile.setReadable(true);
         xmlFile.setWritable(true);
         xmlFile.setExecutable(false, false);
         */
-        Writer writer;
+
+        OutputStream ostream;
         try{
-            OutputStream ostream;
             ostream = new FileOutputStream(xmlFile);
-            ostream = new BufferedOutputStream(ostream, 4 * 1024);
-            writer = new OutputStreamWriter(ostream, "UTF-8");
-            writer = new BufferedWriter(writer, 4 * 1024);
-        }catch(IOException e){
-            errprintln(
-                    xmlFile.getName() + " に書き込めません。");
+        }catch(FileNotFoundException e){
+            errprintln(xmlFile.getName() + " に書き込めません。");
             exit(1);
             return null;
         }
+
+        ostream = new BufferedOutputStream(ostream, 4 * 1024);
+
+        Writer writer;
+        writer = new OutputStreamWriter(ostream, CS_UTF8);
+        writer = new BufferedWriter(writer, 4 * 1024);
 
         return writer;
     }

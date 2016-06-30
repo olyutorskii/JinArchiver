@@ -42,7 +42,8 @@ public final class Win31j{
      * 隠しコンストラクタ。
      */
     private Win31j(){
-        throw new Error();
+        assert false;
+        throw new AssertionError();
     }
 
 

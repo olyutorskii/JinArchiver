@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,6 +61,9 @@ public final class XmlUtils{
         schema = factory.newSchema();
 
         Validator validator = schema.newValidator();
+
+        LSResourceResolver resolver = new XmlResolver();
+        validator.setResourceResolver(resolver);
 
         return validator;
     }

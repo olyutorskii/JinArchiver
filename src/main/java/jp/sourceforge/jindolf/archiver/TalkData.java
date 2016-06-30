@@ -74,10 +74,10 @@ public class TalkData extends TopicData{
 
     /**
      * 元発言のname属性値を設定する。
-     * @param xName name属性値
+     * @param xNameArg name属性値
      */
-    public void setXName(String xName){
-        this.xName = xName;
+    public void setXName(String xNameArg){
+        this.xName = xNameArg;
         return;
     }
 

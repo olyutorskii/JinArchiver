@@ -33,7 +33,8 @@ public final class HttpAccess{
      * 隠しコンストラクタ。
      */
     private HttpAccess(){
-        throw new Error();
+        assert false;
+        throw new AssertionError();
     }
 
 
@@ -76,9 +77,10 @@ public final class HttpAccess{
         URL url = getPeriodListURL(landDef, vid);
 
         Charset charset = landDef.getEncoding();
-        InputStream istream = url.openStream();
-        DecodedContent content = Builder.contentFromStream(charset, istream);
-        istream.close();
+        DecodedContent content;
+        try(InputStream istream = url.openStream()){
+            content = Builder.contentFromStream(charset, istream);
+        }
 
         HtmlParser parser = new HtmlParser();
         PeriodListHandler handler = new PeriodListHandler(landDef, vid);
@@ -125,10 +127,10 @@ public final class HttpAccess{
          */
         public String getURL(PeriodType type, int day){
             String base = this.landDef.getCgiURI().toASCIIString();
-            base += "?vid=" + this.vid;
+            base += "?vid=" + this.vid + "&meslog=";
 
-            if(this.landDef.getLandId().equals("wolfg")){
-                base += "&meslog=";
+            String landId = this.landDef.getLandId();
+            if("wolfg".equals(landId)){
                 String dnum = "000" + (day - 1);
                 dnum = dnum.substring(dnum.length() - 3);
                 switch(type){
@@ -148,7 +150,7 @@ public final class HttpAccess{
                     return null;
                 }
             }else{
-                base += "&meslog=" + this.vid + "_";
+                base += this.vid + "_";
                 switch(type){
                 case PROLOGUE:
                     base += "ready_0";

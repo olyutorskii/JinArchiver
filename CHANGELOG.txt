@@ -4,7 +4,7 @@
 JinArchiver 変更履歴
 
 
-X.XXX.X (20XX-XX-XX)
+1.503.2 (2016-07-05)
     ・必須環境をJRE7に引き上げ。
     ・Mavenプラグイン更新。
     ・OSDN.JP対応。

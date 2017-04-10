@@ -8,7 +8,7 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-  http://maven.apache.org/maven-v4_0_0.xsd"
+  http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
     <modelVersion>4.0.0</modelVersion>
     <!--parent/-->
@@ -37,7 +37,7 @@
     <licenses>
         <license>
             <name>The MIT License</name>
-            <url>https://opensource.org/licenses/mit-license.php</url>
+            <url>https://opensource.org/licenses/MIT</url>
             <distribution>manual</distribution>
         </license>
     </licenses>
@@ -47,7 +47,7 @@
             <id>olyutorskii</id>
             <url>https://sites.google.com/site/olyutorskiipit/</url>
             <organization>Jindolf Partners</organization>
-            <organizationUrl>https://osdn.jp/projects/jindolf/devel/</organizationUrl>
+            <organizationUrl>https://ja.osdn.net/projects/jindolf/devel/</organizationUrl>
             <roles>
                 <role>Project Founder</role>
                 <role>Java Developer</role>
@@ -59,7 +59,7 @@
     <mailingLists/>
 
     <prerequisites>
-        <maven>3.3</maven>
+        <maven>3.0.1</maven>
     </prerequisites>
 
     <modules/>
@@ -71,29 +71,43 @@
     </scm>
 
     <issueManagement>
-        <system>OSDN.JP</system>
-        <url>https://osdn.jp/projects/jindolf/ticket/</url>
+        <system>OSDN.NET</system>
+        <url>https://ja.osdn.net/projects/jindolf/ticket/</url>
     </issueManagement>
 
     <ciManagement/>
     <distributionManagement/>
 
     <properties>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
 
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
 
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <site.locales>en</site.locales>
+        <javadoc.locale>en</javadoc.locale>
+        <findbugs.jvmArgs>-Duser.language=en</findbugs.jvmArgs>
         <project.mainconf>${project.basedir}/src/main/config</project.mainconf>
 
+        <jacoco-plugin.version>0.7.9</jacoco-plugin.version>
+
+        <checkstyle-plugin.version>2.17</checkstyle-plugin.version>
+        <checkstyleruntime.version>6.19</checkstyleruntime.version>
         <checkstyle.config.location>${project.mainconf}/checks.xml</checkstyle.config.location>
         <checkstyle.enable.rss>false</checkstyle.enable.rss>
+
+        <pmd-plugin.version>3.7</pmd-plugin.version>
+
+        <findbugs-plugin.version>3.0.4</findbugs-plugin.version>
+        <findbugs.effort>Max</findbugs.effort>
+        <findbugs.threshold>Low</findbugs.threshold>
+        <!-- for Jenkins -->
+        <findbugs.xmlOutput>true</findbugs.xmlOutput>
 
         <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
 
@@ -127,27 +141,8 @@
 
         <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
-                <configuration>
-                    <rules>
-                        <requireMavenVersion>
-                            <version>[3.3,)</version>
-                        </requireMavenVersion>
-                        <requireJavaVersion>
-                            <version>[1.7,)</version>
-                        </requireJavaVersion>
-                    </rules>
-                </configuration>
-            </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
-            </plugin>
+            <!-- clean lifecycle -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -158,38 +153,87 @@
                         <fileset>
                             <directory>${project.basedir}</directory>
                             <includes>
-                                <include>**/.DS_Store</include>
-                                <include>**/_MACOSX</include>
+                                <include>**/*~</include>
+                                <include>**/*.swp</include>
+                                <include>**/*.DS_Store</include>
+                                <include>**/._*</include>
+                                <include>**/__MACOSX</include>
                                 <include>**/Thumbs.db</include>
-                                <include>**/thumbs.db</include>
-                                <include>**/Desktop.ini</include>
                                 <include>**/desktop.ini</include>
                                 <include>**/core</include>
+                                <include>**/hs_err_pid*</include>
                             </includes>
                         </fileset>
                     </filesets>
                 </configuration>
             </plugin>
 
+
+            <!-- default lifecycle -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <configuration>
+                    <rules>
+                        <requireMavenVersion>
+                            <version>[3.0.1,)</version>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                            <version>[1.7,)</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.1</version>
                 <configuration>
                     <source>1.7</source>  <!-- for NetBeans IDE -->
                     <target>1.7</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
                     <compilerArguments>
                         <Xlint/>
                     </compilerArguments>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <enableAssertions>true</enableAssertions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format> <!-- for Jenkins -->
+                    </formats>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -230,20 +274,8 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <archiveBaseDirectory>.</archiveBaseDirectory>
-                    <descriptors>
-                        <descriptor>src/main/assembly/descriptor.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
                 <configuration>
                     <includePom>true</includePom>
                     <archive>
@@ -265,19 +297,18 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.0</version>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
-                <configuration>
-                    <skipTests>false</skipTests>
-                    <enableAssertions>true</enableAssertions>
-                </configuration>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
             </plugin>
+
+
+            <!-- site lifecycle -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -291,50 +322,26 @@
                 </configuration>
             </plugin>
 
+
+            <!-- goals without lifecycle -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archiveBaseDirectory>.</archiveBaseDirectory>
+                    <descriptors>
+                        <descriptor>src/main/assembly/descriptor.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.15</version>
                 <!-- config from property value -->
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.6</version>
-                <configuration>
-                    <targetJdk>${maven.compiler.target}</targetJdk>
-                    <rulesets>
-                        <ruleset>${project.mainconf}/pmdrules.xml</ruleset>
-                    </rulesets>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <!-- for Jenkins -->
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format> <!-- for Jenkins -->
-                    </formats>
-                </configuration>
             </plugin>
 
         </plugins>
@@ -373,7 +380,7 @@
                     <exclude>**/version.properties</exclude>
 
                     <exclude>**/.DS_Store</exclude>
-                    <exclude>**/_MACOSX</exclude>
+                    <exclude>**/__MACOSX</exclude>
                     <exclude>**/Thumbs.db</exclude>
                     <exclude>**/thumbs.db</exclude>
                     <exclude>**/Desktop.ini</exclude>
@@ -532,18 +539,6 @@
                     <xmlOutput>true</xmlOutput>
                     <!-- excludeFilterFile/ -->
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>javancss-maven-plugin</artifactId>
-                <version>2.1</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-                <version>2.0</version>
             </plugin>
 
         </plugins>

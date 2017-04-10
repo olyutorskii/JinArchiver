@@ -38,7 +38,7 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 
 === 開発プロジェクト運営元 ===
 
-  https://osdn.jp/projects/jindolf/ まで。
+  https://ja.osdn.net/projects/jindolf/ まで。
 
 
 === ディレクトリ内訳構成 ===
@@ -60,6 +60,15 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 ./pom.xml
     Maven3用プロジェクト構成定義ファイル。
 
+./checkstyle.xml
+    Checkstyle用configファイル。
+
+./pmdrules.xml
+    PMD用ルール定義ファイル。
+
+./src/assembly/src.xml
+    ソースアーカイブ構成定義ファイル。
+
 ./src/main/java/
     Javaのソースコード。
 
@@ -68,18 +77,6 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 
 ./src/test/java/
     JUnit 4.* 用のユニットテストコード。
-
-./src/main/config/
-    各種ビルド・構成管理に必要なファイル群。
-
-./src/main/config/checks.xml
-    Checkstyle用configファイル。
-
-./src/main/config/pmdrules.xml
-    PMD用ルール定義ファイル。
-
-./src/main/assembly/descriptor.xml
-    ソースアーカイブ構成定義ファイル。
 
 
 --- EOF ---

@@ -17,8 +17,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
-import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
-import jp.sourceforge.jindolf.parser.DecodedContent;
+import jp.osdn.jindolf.parser.content.DecodeErrorInfo;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 
 
 /**

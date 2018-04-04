@@ -9,6 +9,12 @@ package jp.sourceforge.jindolf.archiver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jp.osdn.jindolf.parser.EntityConverter;
+import jp.osdn.jindolf.parser.HtmlAdapter;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.PageType;
+import jp.osdn.jindolf.parser.SeqRange;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import jp.sourceforge.jindolf.corelib.DisclosureType;
 import jp.sourceforge.jindolf.corelib.EventFamily;
 import jp.sourceforge.jindolf.corelib.GameRole;
@@ -18,12 +24,6 @@ import jp.sourceforge.jindolf.corelib.SysEventType;
 import jp.sourceforge.jindolf.corelib.TalkType;
 import jp.sourceforge.jindolf.corelib.Team;
 import jp.sourceforge.jindolf.corelib.VillageTag;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.EntityConverter;
-import jp.sourceforge.jindolf.parser.HtmlAdapter;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.PageType;
-import jp.sourceforge.jindolf.parser.SeqRange;
 
 /**
  * パーサ用ハンドラ。

@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import jp.sourceforge.jindolf.corelib.DisclosureType;
 import jp.sourceforge.jindolf.corelib.SysEventType;
-import jp.sourceforge.jindolf.parser.DecodedContent;
 
 /**
  * Periodモデル。

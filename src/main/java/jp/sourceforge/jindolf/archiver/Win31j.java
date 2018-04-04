@@ -12,8 +12,8 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
-import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
-import jp.sourceforge.jindolf.parser.DecodedContent;
+import jp.osdn.jindolf.parser.content.DecodeErrorInfo;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 
 /**
  * windows-31jエンコーディング(機種依存文字)に関する諸々。

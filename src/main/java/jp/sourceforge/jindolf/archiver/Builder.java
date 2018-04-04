@@ -7,20 +7,19 @@
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
+import io.bitbucket.olyutorskii.jiocema.DecodeNotifier;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import jp.sourceforge.jindolf.parser.ContentBuilder;
-import jp.sourceforge.jindolf.parser.ContentBuilderSJ;
-import jp.sourceforge.jindolf.parser.ContentBuilderUCS2;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.HtmlParser;
-import jp.sourceforge.jindolf.parser.SjisDecoder;
-import jp.sourceforge.jindolf.parser.StreamDecoder;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.HtmlParser;
+import jp.osdn.jindolf.parser.content.ContentBuilder;
+import jp.osdn.jindolf.parser.content.ContentBuilderSJ;
+import jp.osdn.jindolf.parser.content.DecodedContent;
+import jp.osdn.jindolf.parser.content.SjisNotifier;
 
 /**
  * 入力から内部構造を生成する。
@@ -45,27 +44,27 @@ public final class Builder{
      * @param istream 入力ストリーム
      * @return デコード結果
      * @throws IOException 入力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      */
     public static DecodedContent contentFromStream(Charset charset,
                                                      InputStream istream)
-            throws IOException, DecodeException{
-        StreamDecoder decoder;
+            throws IOException, DecodeBreakException{
+        DecodeNotifier decoder;
         ContentBuilder builder;
 
         String name = charset.name();
         if("Shift_JIS".equalsIgnoreCase(name)){
-            decoder = new SjisDecoder();
+            decoder = new SjisNotifier();
             builder = new ContentBuilderSJ(BUF_SZ);
         }else if("UTF-8".equalsIgnoreCase(name)){
-            decoder = new StreamDecoder(charset.newDecoder());
-            builder = new ContentBuilderUCS2(BUF_SZ);
+            decoder = new DecodeNotifier(charset.newDecoder());
+            builder = new ContentBuilder(BUF_SZ);
         }else{
             assert false;
             return null;
         }
 
-        decoder.setDecodeHandler(builder);
+        decoder.setCharDecodeListener(builder);
 
         decoder.decode(istream);
 
@@ -78,11 +77,11 @@ public final class Builder{
      * 村の各日々をロードしパースする。
      * @param villageData 村情報
      * @throws IOException 入力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      */
     public static void fillVillageData(VillageData villageData)
-            throws IOException, DecodeException, HtmlParseException {
+            throws IOException, DecodeBreakException, HtmlParseException {
         HtmlParser parser = new HtmlParser();
         Handler handler = new Handler();
         parser.setBasicHandler   (handler);

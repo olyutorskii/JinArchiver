@@ -10,7 +10,7 @@ package jp.sourceforge.jindolf.archiver;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import jp.sourceforge.jindolf.parser.DecodedContent;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 
 /**
  * テキスト行の集合。

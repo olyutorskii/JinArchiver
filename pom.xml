@@ -104,7 +104,8 @@
         <checkstyle.suppressions.location>${project.basedir}/config/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
         <checkstyle.enable.rss>false</checkstyle.enable.rss>
 
-        <pmd-plugin.version>3.7</pmd-plugin.version>
+        <pmd-plugin.version>3.12.0</pmd-plugin.version>
+        <pmd.analysisCache>true</pmd.analysisCache>
 
         <spotbugs-plugin.version>3.1.11</spotbugs-plugin.version>
         <spotbugs.effort>Max</spotbugs.effort>

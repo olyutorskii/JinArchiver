@@ -16,7 +16,7 @@
     <groupId>jp.sourceforge.jindolf</groupId>
     <artifactId>jinarchiver</artifactId>
 
-    <version>1.503.105-SNAPSHOT</version>
+    <version>1.503.106</version>
 
     <packaging>jar</packaging>
     <name>JinArchiver</name>

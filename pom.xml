@@ -98,8 +98,8 @@
         <surefire-plugin.version>3.0.0-M3</surefire-plugin.version>
         <jacoco-plugin.version>0.8.3</jacoco-plugin.version>
 
-        <checkstyle-plugin.version>2.17</checkstyle-plugin.version>
-        <checkstyleruntime.version>6.19</checkstyleruntime.version>
+        <checkstyle-plugin.version>3.0.0</checkstyle-plugin.version>
+        <checkstyleruntime.version>8.20</checkstyleruntime.version>
         <checkstyle.config.location>${project.basedir}/config/checkstyle/checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>${project.basedir}/config/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
         <checkstyle.enable.rss>false</checkstyle.enable.rss>
@@ -154,7 +154,6 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <!--artifactId>checkstyle-backport-jre6</artifactId-->
                             <version>${checkstyleruntime.version}</version>
                         </dependency>
                     </dependencies>

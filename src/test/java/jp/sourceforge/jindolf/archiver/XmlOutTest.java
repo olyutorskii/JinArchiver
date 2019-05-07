@@ -5,8 +5,8 @@ package jp.sourceforge.jindolf.archiver;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
-import jp.sourceforge.jindolf.parser.DecodedContent;
+import jp.osdn.jindolf.parser.content.DecodeErrorInfo;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

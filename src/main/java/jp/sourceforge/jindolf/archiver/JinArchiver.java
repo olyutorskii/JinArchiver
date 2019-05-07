@@ -7,6 +7,7 @@
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,9 +25,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
 import javax.xml.validation.Validator;
+import jp.osdn.jindolf.parser.HtmlParseException;
 import jp.sourceforge.jindolf.corelib.LandDef;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
 import org.xml.sax.SAXException;
 
 /**
@@ -185,7 +185,7 @@ public final class JinArchiver{
         }catch(IOException e){
             abortWithException(e);
             return;
-        }catch(DecodeException e){
+        }catch(DecodeBreakException e){
             abortWithException(e);
             return;
         }catch(HtmlParseException e){
@@ -251,11 +251,11 @@ public final class JinArchiver{
      * @param vid 村番号
      * @return 村情報
      * @throws IOException 入出力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      */
     public static VillageData load(LandDef landDef, int vid)
-            throws IOException, DecodeException, HtmlParseException{
+            throws IOException, DecodeBreakException, HtmlParseException{
         List<PeriodResource> resourceList =
                 HttpAccess.loadResourceList(landDef, vid);
         VillageData villageData = new VillageData(resourceList);

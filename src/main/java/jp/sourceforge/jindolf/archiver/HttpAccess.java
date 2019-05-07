@@ -7,22 +7,22 @@
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import jp.osdn.jindolf.parser.HtmlAdapter;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.HtmlParser;
+import jp.osdn.jindolf.parser.PageType;
+import jp.osdn.jindolf.parser.SeqRange;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.corelib.LandState;
 import jp.sourceforge.jindolf.corelib.PeriodType;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.HtmlAdapter;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.HtmlParser;
-import jp.sourceforge.jindolf.parser.PageType;
-import jp.sourceforge.jindolf.parser.SeqRange;
 
 /**
  * 人狼HTTPサーバ内のリソース情報を展開する。
@@ -65,13 +65,13 @@ public final class HttpAccess{
      * @param landDef 国指定
      * @param vid 村番号
      * @return ロード元情報一覧
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      * @throws IOException 入力エラー
      */
     public static List<PeriodResource> loadResourceList(LandDef landDef,
                                                           int vid)
-            throws DecodeException,
+            throws DecodeBreakException,
                    HtmlParseException,
                    IOException {
         URL url = getPeriodListURL(landDef, vid);

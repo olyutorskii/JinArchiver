@@ -102,7 +102,7 @@
         <!-- for Jenkins -->
         <spotbugs.xmlOutput>true</spotbugs.xmlOutput>
 
-        <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
+        <project.mainentry>jp.osdn.jindolf.ar.JinArchiver</project.mainentry>
 
     </properties>
 

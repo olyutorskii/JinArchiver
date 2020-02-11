@@ -16,7 +16,7 @@
     <groupId>jp.sourceforge.jindolf</groupId>
     <artifactId>jinarchiver</artifactId>
 
-    <version>1.503.107-SNAPSHOT</version>
+    <version>1.504.2</version>
 
     <packaging>jar</packaging>
     <name>JinArchiver</name>
@@ -102,7 +102,7 @@
         <!-- for Jenkins -->
         <spotbugs.xmlOutput>true</spotbugs.xmlOutput>
 
-        <project.mainentry>jp.sourceforge.jindolf.archiver.JinArchiver</project.mainentry>
+        <project.mainentry>jp.osdn.jindolf.ar.JinArchiver</project.mainentry>
 
     </properties>
 

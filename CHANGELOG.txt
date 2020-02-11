@@ -4,7 +4,7 @@
 JinArchiver 変更履歴
 
 
-1.504.X (2020-XX-XX)
+1.504.2 (2020-02-11)
     ・G国亡国に伴い JinParser 2.102.2 に対応。
     ・起動クラスのFQNをjp.osdn.jindolf.ar.JinArchiverに短縮。
 

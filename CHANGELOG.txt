@@ -4,6 +4,9 @@
 JinArchiver 変更履歴
 
 
+X.XXX.X (2020-XX-XX)
+    ・プレイヤーURL前後の不正キャラクタをサニタイズ。
+
 1.504.2 (2020-02-11)
     ・G国亡国に伴い JinParser 2.102.2 に対応。
     ・起動クラスのFQNをjp.osdn.jindolf.ar.JinArchiverに短縮。

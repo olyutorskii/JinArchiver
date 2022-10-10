@@ -1,4 +1,3 @@
-$Id: 00README.txt 879 2009-10-25 15:42:50Z olyutorskii $
 [UTF-8 Japanese]
 
                                JinArchiver
@@ -41,9 +40,9 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 
   このアーカイブは、UTF-8による開発環境を前提として構成されています。
   このアーカイブの原本となる開発資産は、
-      http://svn.sourceforge.jp/svnroot/jindolf/JinArchiver/
-  を上位に持つSubversionリポジトリで管理されています。
-  アーカイブの代わりにSubversionを通じて開発資産にアクセスすることにより、
+      http://hg.sourceforge.jp/view/jindolf/JinArchiver/
+  を上位に持つMercurialリポジトリで管理されています。
+  アーカイブの代わりにMercurialを通じて開発資産にアクセスすることにより、
   任意の文字コードに変換されたJavaソースファイルや各種リソースを
   容易に入手することが可能です。
 
@@ -55,21 +54,14 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 
 === ディレクトリ内訳構成 ===
 
-./00README.txt
+./README.txt
     あなたが今見てるこれ。
 
-./ChangeLog.txt
+./CHANGELOG.txt
     変更履歴。
 
-./License.txt
+./LICENSE.txt
     ライセンスに関して。
-
-./antbuild.xml
-    Apache Ant1.7用ビルドファイル。
-
-./depend.properties
-    このパッケージおよびこのパッケージが依存する他パッケージのバージョン情報。
-    Antタスクにより自動的にメンテナンスされる。
 
 ./src/
     Javaのソースコード。XMLなどの各種リソース。
@@ -77,16 +69,29 @@ java -jar jinarchiver-X.X.X.jar -land wolff -vid 1507 -outdir /tmp
 ./test/
     JUnit 4.* 用のテストコード。
 
-./scripts/
-    各種ビルド・構成管理に必要なファイル群。
+./pom.xml
+    Maven2用プロジェクト構成定義ファイル。
 
-./scripts/checks.xml
+./build.xml
+    Ant用追加タスク。
+
+./src/main/java/
+    Javaのソースコード。
+
+./src/main/resources/
+    プロパティファイルなどの各種リソース。
+
+./src/test/java/
+    JUnit 4.* 用のユニットテストコード。
+
+./src/main/config/checks.xml
     Checkstyle用configファイル。
 
-./scripts/fbexfilter.xml
-    FindBugs用フィルタファイル。
-
-./scripts/pmdrules.xml
+./src/main/config/pmdrules.xml
     PMD用ルール定義ファイル。
+
+./src/main/assembly/descriptor.xml
+    ソースアーカイブ構成定義ファイル。
+
 
 --- EOF ---

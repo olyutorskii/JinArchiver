@@ -6,7 +6,6 @@
     PMD [ http://pmd.sourceforge.net/ ] 4.2.5 以降用に記述されています。
 
     Copyright(c) 2009 olyutorskii
-    $Id: pmdrules.xml 836 2009-09-09 15:58:36Z olyutorskii $
 -->
 
 <ruleset>

@@ -2,7 +2,6 @@
  * downloader
  *
  * Copyright(c) 2008 olyutorskii
- * $Id: HttpAccess.java 877 2009-10-25 15:16:13Z olyutorskii $
  */
 
 package jp.sourceforge.jindolf.archiver;
@@ -10,6 +9,7 @@ package jp.sourceforge.jindolf.archiver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import jp.sourceforge.jindolf.corelib.LandDef;
@@ -66,8 +66,9 @@ public final class HttpAccess{
                    IOException {
         URL url = getPeriodListURL(landDef, vid);
 
+        Charset charset = landDef.getEncoding();
         InputStream istream = url.openStream();
-        DecodedContent content = Builder.contentFromStream(istream);
+        DecodedContent content = Builder.contentFromStream(charset, istream);
         istream.close();
 
         HtmlParser parser = new HtmlParser();
@@ -123,19 +124,42 @@ public final class HttpAccess{
         public String getURL(PeriodType type, int day){
             String base = this.landDef.getCgiURI().toASCIIString();
             base += "?vid=" + this.vid;
-            base += "&meslog=" + this.vid + "_";
-            switch(type){
-            case PROLOGUE:
-                base += "ready_0";
-                break;
-            case PROGRESS:
-                base += "progress_" + (day - 1);
-                break;
-            case EPILOGUE:
-                base += "party_" + (day - 1);
-                break;
-            default:
-                return null;
+
+            if(this.landDef.getLandId().equals("wolfg")){
+                base += "&meslog=";
+                String dnum = "000" + (day - 1);
+                dnum = dnum.substring(dnum.length() - 3);
+                switch(type){
+                case PROLOGUE:
+                    base += "000_ready";
+                    break;
+                case PROGRESS:
+                    base += dnum;
+                    base += "_progress";
+                    break;
+                case EPILOGUE:
+                    base += dnum;
+                    base += "_party";
+                    break;
+                default:
+                    assert false;
+                    return null;
+                }
+            }else{
+                base += "&meslog=" + this.vid + "_";
+                switch(type){
+                case PROLOGUE:
+                    base += "ready_0";
+                    break;
+                case PROGRESS:
+                    base += "progress_" + (day - 1);
+                    break;
+                case EPILOGUE:
+                    base += "party_" + (day - 1);
+                    break;
+                default:
+                    return null;
+                }
             }
 
             base += "&mes=all";

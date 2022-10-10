@@ -2,7 +2,6 @@
  * talk dialog
  *
  * Copyright(c) 2008 olyutorskii
- * $Id: TalkData.java 877 2009-10-25 15:16:13Z olyutorskii $
  */
 
 package jp.sourceforge.jindolf.archiver;
@@ -16,7 +15,6 @@ import jp.sourceforge.jindolf.corelib.TalkType;
  */
 public class TalkData extends TopicData{
 
-    private final PeriodData parent;
     private TalkType talkType = null;
     private AvatarData avatarData = null;
     private String xName;
@@ -26,11 +24,9 @@ public class TalkData extends TopicData{
 
     /**
      * コンストラクタ。
-     * @param parent 所属Period
      */
-    public TalkData(PeriodData parent){
+    public TalkData(){
         super();
-        this.parent = parent;
         return;
     }
 

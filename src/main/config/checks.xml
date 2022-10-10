@@ -12,7 +12,6 @@
     [ http://checkstyle.sourceforge.net/ ]
 
     Copyright(c) 2009 olyutorskii
-    $Id: checks.xml 835 2009-09-09 11:51:03Z olyutorskii $
 -->
 
 
@@ -194,10 +193,6 @@
         <module name="UpperEll" />
         <module name="ArrayTypeStyle" />
         <module name="Regexp">
-            <property name="format" value="^ \* \$Id:[^\$]*\$$" />
-            <property name="duplicateLimit" value="1" />
-        </module>
-        <module name="Regexp">
             <property name="format" value="@author" />
             <property name="illegalPattern" value="true" />
         </module>
@@ -361,6 +356,13 @@ Miscellaneous
         <module name="RegexpSingleline" />
         <module name="RegexpMultiline" />
         <module name="RegexpSinglelineJava" />
+-->
+
+<!-- Mercurialでは使わない
+        <module name="Regexp">
+            <property name="format" value="^ \* \$Id:[^\$]*\$$" />
+            <property name="duplicateLimit" value="1" />
+        </module>
 -->
 
 <!-- ボツチェック

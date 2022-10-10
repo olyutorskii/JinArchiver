@@ -2,7 +2,6 @@
  * parse handler
  *
  * Copyright(c) 2008 olyutorskii
- * $Id: Handler.java 877 2009-10-25 15:16:13Z olyutorskii $
  */
 
 package jp.sourceforge.jindolf.archiver;
@@ -261,7 +260,7 @@ public class Handler extends HtmlAdapter{
      */
     @Override
     public void startTalk() throws HtmlParseException{
-        this.currentTalk = new TalkData(this.currentPeriod);
+        this.currentTalk = new TalkData();
         return;
     }
 
@@ -575,6 +574,33 @@ public class Handler extends HtmlAdapter{
     /**
      * {@inheritDoc}
      * @param content {@inheritDoc}
+     * @param voteByRange {@inheritDoc}
+     * @param voteToRange {@inheritDoc}
+     * @throws HtmlParseException {@inheritDoc}
+     */
+    @Override
+    public void sysEventCounting2(DecodedContent content,
+                                    SeqRange voteByRange,
+                                    SeqRange voteToRange)
+            throws HtmlParseException{
+        AvatarData avatar;
+
+        DecodedContent voteBy =
+                this.converter.convert(content, voteByRange);
+        avatar = this.villageData.getAvatarData(voteBy);
+        this.currentEvent.addAvatarData(avatar);
+
+        DecodedContent voteTo =
+                this.converter.convert(content, voteToRange);
+        avatar = this.villageData.getAvatarData(voteTo);
+        this.currentEvent.addAvatarData(avatar);
+
+        return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param content {@inheritDoc}
      * @param avatarRange {@inheritDoc}
      * @throws HtmlParseException {@inheritDoc}
      */
@@ -757,6 +783,64 @@ public class Handler extends HtmlAdapter{
         AvatarData judgeTo = this.villageData.getAvatarData(avatarName);
         this.currentEvent.addAvatarData(judgeTo);
 
+        return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param content {@inheritDoc}
+     * @param avatarRange {@inheritDoc}
+     * @param votes {@inheritDoc}
+     * @throws HtmlParseException {@inheritDoc}
+     */
+    @Override
+    public void sysEventExecution(DecodedContent content,
+                                    SeqRange avatarRange,
+                                    int votes)
+            throws HtmlParseException{
+        DecodedContent avatarName;
+        avatarName = this.converter.convert(content, avatarRange);
+        AvatarData avatar = this.villageData.getAvatarData(avatarName);
+        this.currentEvent.addAvatarData(avatar);
+
+        if(votes > 0){
+            this.currentEvent.addInteger(votes);
+        }
+
+        return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param content {@inheritDoc}
+     * @param avatarRange {@inheritDoc}
+     * @throws HtmlParseException {@inheritDoc}
+     */
+    @Override
+    public void sysEventCheckout(DecodedContent content,
+                                   SeqRange avatarRange)
+            throws HtmlParseException{
+        DecodedContent avatarName;
+        avatarName = this.converter.convert(content, avatarRange);
+        AvatarData avatar = this.villageData.getAvatarData(avatarName);
+        this.currentEvent.addAvatarData(avatar);
+        return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param content {@inheritDoc}
+     * @param avatarRange {@inheritDoc}
+     * @throws HtmlParseException {@inheritDoc}
+     */
+    @Override
+    public void sysEventVanish(DecodedContent content,
+                                 SeqRange avatarRange)
+            throws HtmlParseException{
+        DecodedContent avatarName;
+        avatarName = this.converter.convert(content, avatarRange);
+        AvatarData avatar = this.villageData.getAvatarData(avatarName);
+        this.currentEvent.addAvatarData(avatar);
         return;
     }
 

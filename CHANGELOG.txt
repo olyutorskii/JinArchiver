@@ -1,0 +1,15 @@
+[UTF-8 Japanese]
+
+
+JinArchiver 変更履歴
+
+
+1.501.2 (2011-04-20)
+    ・G国に対応。vanish,checkout,shortMember,counting2,executionタグの追加。
+    ・JinParser 1.407.2版に対応。
+    ・SCMをSubversionからMercurialに移行
+
+1.401.2 (2009-10-26)
+    ・初回リリース。
+
+--- EOF ---

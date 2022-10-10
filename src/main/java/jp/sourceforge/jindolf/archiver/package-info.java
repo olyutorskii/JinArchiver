@@ -7,7 +7,6 @@
  * パッケージコメントとパッケージ宣言のみが含まれます。
  *
  * Copyright(c) 2008 olyutorskii
- * $Id: package-info.java 877 2009-10-25 15:16:13Z olyutorskii $
  */
 
 /**

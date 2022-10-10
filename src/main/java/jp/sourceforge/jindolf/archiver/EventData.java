@@ -433,8 +433,8 @@ public class EventData extends TopicData{
             writer.attrOut("role", roleName);
 
             String uriStr = uri.toString();
-            uriStr = uriStr.replaceAll("^[\\s]+", "");
-            uriStr = uriStr.replaceAll("[\\s]+$", "");
+            uriStr = uriStr.replaceAll("^[\\s\\p{Cntrl}]+", "");
+            uriStr = uriStr.replaceAll("[\\s\\p{Cntrl}]+$", "");
             uriStr = uriStr.replaceAll("[\\s]+", "\u0020");
             if(uriStr.length() > 0){
                 writer.sp();

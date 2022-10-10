@@ -1,25 +1,25 @@
 /*
  * information builder from input
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
+import io.bitbucket.olyutorskii.jiocema.DecodeNotifier;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import jp.sourceforge.jindolf.parser.ContentBuilder;
-import jp.sourceforge.jindolf.parser.ContentBuilderSJ;
-import jp.sourceforge.jindolf.parser.ContentBuilderUCS2;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.HtmlParser;
-import jp.sourceforge.jindolf.parser.SjisDecoder;
-import jp.sourceforge.jindolf.parser.StreamDecoder;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.HtmlParser;
+import jp.osdn.jindolf.parser.content.ContentBuilder;
+import jp.osdn.jindolf.parser.content.ContentBuilderSJ;
+import jp.osdn.jindolf.parser.content.DecodedContent;
+import jp.osdn.jindolf.parser.content.SjisNotifier;
 
 /**
  * 入力から内部構造を生成する。
@@ -28,32 +28,43 @@ public final class Builder{
 
     private static final int BUF_SZ = 100 * 1024;
 
+
+    /**
+     * 隠れコンストラクタ。
+     */
+    private Builder(){
+        assert false;
+        throw new AssertionError();
+    }
+
+
     /**
      * 入力ストリームをデコードする。
      * @param charset 文字コード指定
      * @param istream 入力ストリーム
      * @return デコード結果
      * @throws IOException 入力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      */
     public static DecodedContent contentFromStream(Charset charset,
                                                      InputStream istream)
-            throws IOException, DecodeException{
-        StreamDecoder decoder;
+            throws IOException, DecodeBreakException{
+        DecodeNotifier decoder;
         ContentBuilder builder;
 
-        if(charset.name().equalsIgnoreCase("Shift_JIS")){
-            decoder = new SjisDecoder();
+        String name = charset.name();
+        if("Shift_JIS".equalsIgnoreCase(name)){
+            decoder = new SjisNotifier();
             builder = new ContentBuilderSJ(BUF_SZ);
-        }else if(charset.name().equalsIgnoreCase("UTF-8")){
-            decoder = new StreamDecoder(charset.newDecoder());
-            builder = new ContentBuilderUCS2(BUF_SZ);
+        }else if("UTF-8".equalsIgnoreCase(name)){
+            decoder = new DecodeNotifier(charset.newDecoder());
+            builder = new ContentBuilder(BUF_SZ);
         }else{
             assert false;
             return null;
         }
 
-        decoder.setDecodeHandler(builder);
+        decoder.setCharDecodeListener(builder);
 
         decoder.decode(istream);
 
@@ -66,11 +77,11 @@ public final class Builder{
      * 村の各日々をロードしパースする。
      * @param villageData 村情報
      * @throws IOException 入力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      */
     public static void fillVillageData(VillageData villageData)
-            throws IOException, DecodeException, HtmlParseException {
+            throws IOException, DecodeBreakException, HtmlParseException {
         HtmlParser parser = new HtmlParser();
         Handler handler = new Handler();
         parser.setBasicHandler   (handler);
@@ -88,25 +99,20 @@ public final class Builder{
             if(url == null){
                 url = new URL(resource.getOrigUrlText());
             }
+
+            DecodedContent content;
             URLConnection conn = url.openConnection();
-            InputStream istream = conn.getInputStream();
-            if(resource.getDownTimeMs() <= 0){
-                long downTimeMs = conn.getDate();
-                resource.setDownTimeMs(downTimeMs);
+            try(InputStream istream = conn.getInputStream()){//;
+                if(resource.getDownTimeMs() <= 0){
+                    long downTimeMs = conn.getDate();
+                    resource.setDownTimeMs(downTimeMs);
+                }
+                content = contentFromStream(charset, istream);
             }
-            DecodedContent content = contentFromStream(charset, istream);
-            istream.close();
+
             parser.parseAutomatic(content);
         }
 
-        return;
-    }
-
-    /**
-     * 隠れコンストラクタ。
-     */
-    private Builder(){
-        super();
         return;
     }
 

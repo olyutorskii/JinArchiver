@@ -1,6 +1,7 @@
 /*
  * windows-31j encoding utilities
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
@@ -11,13 +12,11 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
-import jp.sourceforge.jindolf.parser.DecodeErrorInfo;
-import jp.sourceforge.jindolf.parser.DecodedContent;
+import jp.osdn.jindolf.parser.content.DecodeErrorInfo;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 
 /**
  * windows-31jエンコーディング(機種依存文字)に関する諸々。
- *
- * TODO 携帯絵文字サポート
  */
 public final class Win31j{
 
@@ -28,15 +27,25 @@ public final class Win31j{
     public static final Charset CS_WIN31J = Charset.forName("windows-31j");
 
     private static final CharsetDecoder WIN31JDECODER;
-    private static final ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+    private static final ByteBuffer BYTEBUFFER = ByteBuffer.allocate(2);
 
     static{
         WIN31JDECODER = CS_WIN31J.newDecoder();
         WIN31JDECODER.onMalformedInput(CodingErrorAction.REPORT);
         WIN31JDECODER.onUnmappableCharacter(CodingErrorAction.REPORT);
         WIN31JDECODER.reset();
-        byteBuffer.clear();
+        BYTEBUFFER.clear();
     }
+
+
+    /**
+     * 隠しコンストラクタ。
+     */
+    private Win31j(){
+        assert false;
+        throw new AssertionError();
+    }
+
 
     /**
      * winsows-31jエンコーディングされたと想定した2バイトデータ
@@ -50,12 +59,12 @@ public final class Win31j{
         char replaced;
 
         WIN31JDECODER.reset();
-        byteBuffer.clear();
-        byteBuffer.put(b1).put(b2);
-        byteBuffer.flip();
+        BYTEBUFFER.clear();
+        BYTEBUFFER.put(b1).put(b2);
+        BYTEBUFFER.flip();
 
         try{
-            replaced = WIN31JDECODER.decode(byteBuffer).charAt(0);
+            replaced = WIN31JDECODER.decode(BYTEBUFFER).charAt(0);
         }catch(CharacterCodingException e){
             replaced = REP_CHAR;
         }
@@ -95,13 +104,6 @@ public final class Win31j{
         }
 
         return;
-    }
-
-    /**
-     * 隠しコンストラクタ。
-     */
-    private Win31j(){
-        throw new Error();
     }
 
 }

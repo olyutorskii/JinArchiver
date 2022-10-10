@@ -1,6 +1,7 @@
 /*
  * parse handler
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
@@ -8,6 +9,12 @@ package jp.sourceforge.jindolf.archiver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jp.osdn.jindolf.parser.EntityConverter;
+import jp.osdn.jindolf.parser.HtmlAdapter;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.PageType;
+import jp.osdn.jindolf.parser.SeqRange;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import jp.sourceforge.jindolf.corelib.DisclosureType;
 import jp.sourceforge.jindolf.corelib.EventFamily;
 import jp.sourceforge.jindolf.corelib.GameRole;
@@ -17,12 +24,6 @@ import jp.sourceforge.jindolf.corelib.SysEventType;
 import jp.sourceforge.jindolf.corelib.TalkType;
 import jp.sourceforge.jindolf.corelib.Team;
 import jp.sourceforge.jindolf.corelib.VillageTag;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.EntityConverter;
-import jp.sourceforge.jindolf.parser.HtmlAdapter;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.PageType;
-import jp.sourceforge.jindolf.parser.SeqRange;
 
 /**
  * パーサ用ハンドラ。
@@ -223,12 +224,12 @@ public class Handler extends HtmlAdapter{
 
             if(periodType == null){
                 newType = DisclosureType.COMPLETE;
-            }else if(periodType == PeriodType.EPILOGUE
-               &&    this.currentResource.getPeriodType()
+            }else if(    periodType == PeriodType.EPILOGUE
+                      && this.currentResource.getPeriodType()
                   != PeriodType.EPILOGUE){
                 newType = DisclosureType.COMPLETE;
-            }else if(   periodType != PeriodType.PROLOGUE
-               &&    this.currentResource.getPeriodType()
+            }else if(    periodType != PeriodType.PROLOGUE
+                      && this.currentResource.getPeriodType()
                   == PeriodType.PROLOGUE){
                 newType = DisclosureType.COMPLETE;
             }else{
@@ -372,32 +373,24 @@ public class Handler extends HtmlAdapter{
             }
         }
 
-        if(   ! this.currentPeriod.hasMurderResult()
-           && this.currentTalk.getTalkType() == TalkType.WOLFONLY
-           && this.currentTalk.getLineNum() == 1){
+        TalkType currentTalkType = this.currentTalk.getTalkType();
+        int talkLineNum = this.currentTalk.getLineNum();
+
+        boolean hasNotMurder  = ! this.currentPeriod.hasMurderResult();
+        boolean isWolfTalk    = currentTalkType == TalkType.WOLFONLY;
+        boolean isOneLineTalk = talkLineNum == 1;
+
+        boolean maybeAssaultEvent =
+                hasNotMurder && isWolfTalk && isOneLineTalk;
+
+        if(maybeAssaultEvent){
             DecodedContent line1st = this.currentTalk.get1stLine();
             Matcher matcher = MURDER_PATTERN.matcher(line1st);
             if(matcher.matches()){
-                AvatarData byWhom = this.currentTalk.getAvatarData();
                 String avatarName = matcher.group(1);
                 AvatarData target =
                         this.villageData.getAvatarData(avatarName);
-                String xname = this.currentTalk.getXName();
-                int hour = this.currentTalk.getHour();
-                int minute = this.currentTalk.getMinute();
-                String iconUri = this.currentTalk.getFaceIconUri();
-                EventData event = new EventData(this.currentPeriod);
-                event.setEventType(SysEventType.ASSAULT);
-                event.addLine(line1st);
-                event.addAvatarData(byWhom);
-                event.addAvatarData(target);
-                event.addDecodedContent(new DecodedContent(xname));
-                event.addInteger(hour);
-                event.addInteger(minute);
-                event.addDecodedContent(new DecodedContent(iconUri));
-                if(byWhom.getFaceIconUri() == null){
-                    byWhom.setFaceIconUri(iconUri);
-                }
+                EventData event = buildAssaultEvent(target);
                 this.currentPeriod.addTopicData(event);
                 this.currentTalk = null;
                 return;
@@ -410,6 +403,39 @@ public class Handler extends HtmlAdapter{
     }
 
     /**
+     * 襲撃イベントを生成する。
+     * @param target 襲撃対象
+     * @return 襲撃イベント
+     */
+    private EventData buildAssaultEvent(AvatarData target){
+        DecodedContent line1st = this.currentTalk.get1stLine();
+
+        String xname = this.currentTalk.getXName();
+
+        int hour   = this.currentTalk.getHour();
+        int minute = this.currentTalk.getMinute();
+
+        AvatarData byWhom = this.currentTalk.getAvatarData();
+        String iconUri    = this.currentTalk.getFaceIconUri();
+        if(byWhom.getFaceIconUri() == null){
+            byWhom.setFaceIconUri(iconUri);
+        }
+
+        EventData event = new EventData();
+
+        event.setEventType(SysEventType.ASSAULT);
+        event.addLine(line1st);
+        event.addAvatarData(byWhom);
+        event.addAvatarData(target);
+        event.addDecodedContent(new DecodedContent(xname));
+        event.addInteger(hour);
+        event.addInteger(minute);
+        event.addDecodedContent(new DecodedContent(iconUri));
+
+        return event;
+    }
+
+    /**
      * {@inheritDoc}
      * @param eventFamily {@inheritDoc}
      * @throws HtmlParseException {@inheritDoc}
@@ -417,7 +443,7 @@ public class Handler extends HtmlAdapter{
     @Override
     public void startSysEvent(EventFamily eventFamily)
             throws HtmlParseException{
-        this.currentEvent = new EventData(this.currentPeriod);
+        this.currentEvent = new EventData();
         return;
     }
 

@@ -1,13 +1,13 @@
 /*
  * talk dialog
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import jp.sourceforge.jindolf.corelib.TalkType;
 
 /**
@@ -74,10 +74,10 @@ public class TalkData extends TopicData{
 
     /**
      * 元発言のname属性値を設定する。
-     * @param xName name属性値
+     * @param xNameArg name属性値
      */
-    public void setXName(String xName){
-        this.xName = xName;
+    public void setXName(String xNameArg){
+        this.xName = xNameArg;
         return;
     }
 
@@ -138,8 +138,9 @@ public class TalkData extends TopicData{
      * @throws IOException 出力エラー
      */
     @Override
-    public void dumpXml(Writer writer) throws IOException{
-        writer.append("<talk\n");
+    public void dumpXml(XmlOut writer) throws IOException{
+        writer.append("<talk");
+        writer.nl();
 
         String typeStr;
         switch(this.talkType){
@@ -159,32 +160,35 @@ public class TalkData extends TopicData{
             throw new IllegalArgumentException();
         }
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "type", typeStr);
+        writer.indent(1);
+        writer.attrOut("type", typeStr);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "avatarId", this.avatarData.getAvatarId());
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("avatarId", this.avatarData.getAvatarId());
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "xname", this.xName);
+        writer.indent(1);
+        writer.attrOut("xname", this.xName);
 
-        writer.append(' ');
-        XmlUtils.timeAttrOut(writer, "time", this.hour, this.minute);
-        writer.append('\n');
+        writer.sp();
+        writer.timeAttrOut("time", this.hour, this.minute);
+        writer.nl();
 
-        if(   this.talkType != TalkType.GRAVE
-           && ! this.faceIconUri.equals(this.avatarData.getFaceIconUri()) ){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer, "faceIconURI", this.faceIconUri);
-            writer.append('\n');
+        if(    this.talkType != TalkType.GRAVE
+            && ! this.faceIconUri.equals(this.avatarData.getFaceIconUri()) ){
+            writer.indent(1);
+            writer.attrOut("faceIconURI", this.faceIconUri);
+            writer.nl();
         }
 
-        writer.append(">\n");
+        writer.append(">");
+        writer.nl();
 
         dumpLines(writer);
 
-        writer.append("</talk>\n");
+        writer.append("</talk>");
+        writer.nl();
+
         return;
     }
 

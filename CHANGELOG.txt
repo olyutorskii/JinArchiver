@@ -4,6 +4,22 @@
 JinArchiver 変更履歴
 
 
+X.XXX.X (XXXX-XX-XX)
+    ・JinParser 2.101.4 に対応。
+
+1.503.4 (2017-04-10)
+    ・F国URL修正に伴い JinCore 1.206.10 に対応。
+
+1.503.2 (2016-07-05)
+    ・必須環境をJRE7に引き上げ。
+    ・Mavenプラグイン更新。
+    ・OSDN.JP対応。
+    ・<rawdata>タグ出力の修正。(バグ#36356)
+    ・XML検証タスクが外部リソースにアクセスしないようになった。
+
+1.502.2 (2011-04-21)
+    ・110421版スキーマに対応。
+
 1.501.2 (2011-04-20)
     ・G国に対応。vanish,checkout,shortMember,counting2,executionタグの追加。
     ・JinParser 1.407.2版に対応。

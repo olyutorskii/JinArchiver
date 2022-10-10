@@ -1,17 +1,19 @@
 /*
  * avatar model
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import jp.sourceforge.jindolf.corelib.PreDefAvatar;
+import org.xml.sax.SAXException;
 
 /**
  * Avatarモデル。
@@ -26,32 +28,21 @@ public class AvatarData{
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             PREDEF_AVATAR_LIST = PreDefAvatar.buildPreDefAvatarList(builder);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
+        }catch(ParserConfigurationException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(IOException e){
+            throw new ExceptionInInitializerError(e);
+        }catch(SAXException e){
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    /**
-     * プリセット済みAvatarをフルネームを用いて取得する。
-     * @param seq フルネーム
-     * @return 見つかったプリセット済みAvatar。見つからなければnull。
-     */
-    public static PreDefAvatar getPreDefAvatar(CharSequence seq){
-        for(PreDefAvatar avatar : PREDEF_AVATAR_LIST){
-            String fullName = avatar.getFullName();
-            if(fullName.contentEquals(seq)){
-                return avatar;
-            }
-        }
-        return null;
-    }
 
     private String fullName;
     private String shortName;
     private String avatarId;
     private String faceIconUri;
+
 
     /**
      * コンストラクタ。
@@ -74,6 +65,22 @@ public class AvatarData{
         this.faceIconUri = null;
 
         return;
+    }
+
+
+    /**
+     * プリセット済みAvatarをフルネームを用いて取得する。
+     * @param seq フルネーム
+     * @return 見つかったプリセット済みAvatar。見つからなければnull。
+     */
+    public static PreDefAvatar getPreDefAvatar(CharSequence seq){
+        for(PreDefAvatar avatar : PREDEF_AVATAR_LIST){
+            String fullName = avatar.getFullName();
+            if(fullName.contentEquals(seq)){
+                return avatar;
+            }
+        }
+        return null;
     }
 
     /**
@@ -149,29 +156,30 @@ public class AvatarData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpXml(Writer writer) throws IOException{
-        writer.append("<avatar\n");
+    public void dumpXml(XmlOut writer) throws IOException{
+        writer.append("<avatar");
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "avatarId", this.avatarId);
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("avatarId", this.avatarId);
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "fullName", this.fullName);
+        writer.indent(1);
+        writer.attrOut("fullName", this.fullName);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "shortName", this.shortName);
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("shortName", this.shortName);
+        writer.nl();
 
         if(this.faceIconUri != null){
-            XmlUtils.indent(writer, 1);
-            XmlUtils.attrOut(writer, "faceIconURI", this.faceIconUri);
-            writer.append('\n');
+            writer.indent(1);
+            writer.attrOut("faceIconURI", this.faceIconUri);
+            writer.nl();
             // F1014対策
         }
 
-        writer.append("/>\n");
-        writer.flush();
+        writer.append("/>");
+        writer.nl();
 
         return;
     }

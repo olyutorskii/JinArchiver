@@ -1,13 +1,13 @@
 /*
  * village data
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +21,43 @@ import jp.sourceforge.jindolf.corelib.PreDefAvatar;
  * villageタグに相当。
  */
 public class VillageData{
+
+    private final List<PeriodResource> resourceList;
+
+    private final LandDef landDef;
+    private final int villageId;
+    private final String baseUri;
+
+    private String fullName = "";
+    private int commitHour = -1;
+    private int commitMinute = -1;
+    private String graveIconUri;
+
+    private final List<AvatarData> avatarList = new LinkedList<>();
+    private int undefAvatarNo = 1;
+
+    private final List<PeriodData> periodList = new LinkedList<>();
+
+
+    /**
+     * コンストラクタ。
+     * @param resourceList PeriodResource並び
+     */
+    public VillageData(List<PeriodResource> resourceList){
+        super();
+
+        validatePeriodResource(resourceList);
+
+        this.resourceList = new LinkedList<>(resourceList);
+
+        PeriodResource resource1st = this.resourceList.get(0);
+        this.landDef   = resource1st.getLandDef();
+        this.villageId = resource1st.getVillageId();
+        this.baseUri = getBaseUri(this.resourceList);
+
+        return;
+    }
+
 
     /**
      * PeriodResourceの組が正当かチェックする。
@@ -114,42 +151,6 @@ public class VillageData{
         }
 
         return result;
-    }
-
-    private final List<PeriodResource> resourceList;
-
-    private final LandDef landDef;
-    private final int villageId;
-    private final String baseUri;
-
-    private String fullName = "";
-    private int commitHour = -1;
-    private int commitMinute = -1;
-    private String graveIconUri;
-
-    private final List<AvatarData> avatarList = new LinkedList<AvatarData>();
-    private int undefAvatarNo = 1;
-
-    private final List<PeriodData> periodList = new LinkedList<PeriodData>();
-
-
-    /**
-     * コンストラクタ。
-     * @param resourceList PeriodResource並び
-     */
-    public VillageData(List<PeriodResource> resourceList){
-        super();
-
-        validatePeriodResource(resourceList);
-
-        this.resourceList = new LinkedList<PeriodResource>(resourceList);
-
-        PeriodResource resource1st = this.resourceList.get(0);
-        this.landDef   = resource1st.getLandDef();
-        this.villageId = resource1st.getVillageId();
-        this.baseUri = getBaseUri(this.resourceList);
-
-        return;
     }
 
     /**
@@ -343,15 +344,18 @@ public class VillageData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpAvatarList(Writer writer) throws IOException{
-        writer.append("<avatarList>").append("\n\n");
+    public void dumpAvatarList(XmlOut writer) throws IOException{
+        writer.append("<avatarList>");
+        writer.nl();
+        writer.nl();
 
         for(AvatarData avatar : this.avatarList){
             avatar.dumpXml(writer);
-            writer.append('\n');
+            writer.nl();
         }
 
-        writer.append("</avatarList>").append('\n');
+        writer.append("</avatarList>");
+        writer.nl();
 
         return;
     }
@@ -361,10 +365,10 @@ public class VillageData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpPeriodList(Writer writer) throws IOException{
+    public void dumpPeriodList(XmlOut writer) throws IOException{
         for(PeriodData period : this.periodList){
             period.dumpXml(writer);
-            writer.append('\n');
+            writer.nl();
         }
         return;
     }
@@ -374,49 +378,49 @@ public class VillageData{
      * @param writer 出力先
      * @throws IOException 出力エラー
      */
-    public void dumpXml(Writer writer) throws IOException{
-        writer.append("<village\n");
+    public void dumpXml(XmlOut writer) throws IOException{
+        writer.append("<village");
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.dumpNameSpaceDecl(writer);
-        writer.append('\n');
+        writer.indent(1);
+        writer.dumpNameSpaceDecl();
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.dumpSiNameSpaceDecl(writer);
-        writer.append('\n');
+        writer.indent(1);
+        writer.dumpSiNameSpaceDecl();
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.dumpSchemeLocation(writer);
-        writer.append('\n');
+        writer.indent(1);
+        writer.dumpSchemeLocation();
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "xml:lang", "ja-JP");
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("xml:lang", "ja-JP");
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "xml:base", this.baseUri);
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("xml:base", this.baseUri);
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "fullName", this.fullName);
+        writer.indent(1);
+        writer.attrOut("fullName", this.fullName);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "vid", Integer.toString(this.villageId));
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("vid", Integer.toString(this.villageId));
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.timeAttrOut(writer,
-                             "commitTime",
-                             this.commitHour, this.commitMinute);
-        writer.append('\n');
+        writer.indent(1);
+        writer.timeAttrOut("commitTime",
+                           this.commitHour, this.commitMinute);
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "state", "gameover");
+        writer.indent(1);
+        writer.attrOut("state", "gameover");
 
         DisclosureType type = getDisclosureType();
         if(type != DisclosureType.COMPLETE){
-            writer.append(' ');
-            XmlUtils.attrOut(writer, "disclosure", type.getXmlName());
+            writer.sp();
+            writer.attrOut("disclosure", type.getXmlName());
         }
 
         String isValid;
@@ -425,55 +429,55 @@ public class VillageData{
         }else{
             isValid = "false";
         }
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "isValid", isValid);
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("isValid", isValid);
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "landName", this.landDef.getLandName());
+        writer.indent(1);
+        writer.attrOut("landName", this.landDef.getLandName());
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "formalName", this.landDef.getFormalName());
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("formalName", this.landDef.getFormalName());
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "landId", this.landDef.getLandId());
+        writer.indent(1);
+        writer.attrOut("landId", this.landDef.getLandId());
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer, "landPrefix", this.landDef.getLandPrefix());
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("landPrefix", this.landDef.getLandPrefix());
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
+        writer.indent(1);
         String locale = this.landDef.getLocale().toString();
         locale = locale.replaceAll("_", "-");
-        XmlUtils.attrOut(writer, "locale", locale);
+        writer.attrOut("locale", locale);
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer,
-                "origencoding", this.landDef.getEncoding().name());
+        writer.sp();
+        writer.attrOut("origencoding", this.landDef.getEncoding().name());
 
-        writer.append(' ');
-        XmlUtils.attrOut(writer,
-                "timezone", this.landDef.getTimeZone().getID());
-        writer.append('\n');
+        writer.sp();
+        writer.attrOut("timezone", this.landDef.getTimeZone().getID());
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "graveIconURI", getGraveIconUri());
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("graveIconURI", getGraveIconUri());
+        writer.nl();
 
-        XmlUtils.indent(writer, 1);
-        XmlUtils.attrOut(writer, "generator", JinArchiver.GENERATOR);
-        writer.append('\n');
+        writer.indent(1);
+        writer.attrOut("generator", JinArchiver.GENERATOR);
+        writer.nl();
 
-        writer.append(">").append('\n');
+        writer.append(">");
+        writer.nl();
 
-        writer.append('\n');
+        writer.nl();
         dumpAvatarList(writer);
 
-        writer.append('\n');
+        writer.nl();
         dumpPeriodList(writer);
 
-        writer.append("</village>").append("\n");
+        writer.append("</village>");
+        writer.nl();
 
         return;
     }

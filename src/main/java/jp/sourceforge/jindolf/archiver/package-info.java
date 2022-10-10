@@ -6,6 +6,7 @@
  * このファイルはソースコードを含まず、
  * パッケージコメントとパッケージ宣言のみが含まれます。
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
@@ -46,9 +47,9 @@
  *
  * <hr>
  *
- * @see <a href="http://jindolf.sourceforge.jp/">
+ * @see <a href="http://jindolf.osdn.jp/">
  * Jindolfポータルサイト</a>
- * @see <a href="http://sourceforge.jp/projects/jindolf/">
+ * @see <a href="https://osdn.jp/projects/jindolf/">
  * Jindolf開発プロジェクト</a>
  */
 

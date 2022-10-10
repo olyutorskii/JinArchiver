@@ -1,98 +1,78 @@
 /*
  * XML-validation task
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.io.Reader;
-import java.io.Writer;
-import javax.xml.XMLConstants;
+import java.util.concurrent.Callable;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
 
 /**
  * XML検証タスク。
  */
-public class ValidateTask implements Runnable{
+public class ValidateTask implements Callable<Void> {
 
-    private static final SchemaFactory FACTORY =
-            SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    private static final String ERR_IO    = "XML入力エラーが発生しました";
+    private static final String ERR_XSD   = "XML検証が失敗しました";
+    private static final String ERR_ABORT = "XML検証が中断されました";
 
-    private final Validator validator;
+
+    private final Reader reader;
     private final Source source;
+    private final Validator validator;
+
 
     /**
      * コンストラクタ。
      * @param reader 文字入力
-     * @throws SAXException 内部エラー
+     * @param valid バリデータ
      */
-    protected ValidateTask(Reader reader) throws SAXException{
+    public ValidateTask(Reader reader, Validator valid){
         super();
-        Schema schema = FACTORY.newSchema();
-        this.validator = schema.newValidator();
-        this.source = new StreamSource(reader);
+        this.reader = reader;
+        this.source = new StreamSource(this.reader);
+        this.validator = valid;
         return;
     }
 
+
     /**
-     * 検証タスク。
-     * {@inheritDoc}
+     * 例外に応じたエラー説明を返す。
+     * @param cause 例外
+     * @return エラー説明
      */
-    public void run(){
+    public static String getErrDescription(Throwable cause){
+        String desc;
+        if     (cause instanceof IOException)  desc = ERR_IO;
+        else if(cause instanceof SAXException) desc = ERR_XSD;
+        else                                   desc = ERR_ABORT;
+        return desc;
+    }
+
+
+    /**
+     * XML検証タスク。
+     * @return null
+     * @throws IOException 入力エラー
+     * @throws SAXException 検証エラー
+     */
+    @Override
+    public Void call() throws IOException, SAXException{
         try{
             this.validator.validate(this.source);
-        }catch(Throwable e){
-            e.printStackTrace(System.err);
-            System.err.println("XML検証に失敗しました。");
-            System.exit(1);
-        }
-        return;
-    }
-
-    /**
-     * 文字出力を横取りしバックグラウンドで検証を行うWriterを生成する。
-     * @param writer 元出力
-     * @return 新しい出力
-     */
-    public static Writer wrapValidator(Writer writer){
-        PipedReader reader = new PipedReader();
-        Writer pipeWriter;
-        try{
-            pipeWriter = new PipedWriter(reader);
-        }catch(IOException e){
-            e.printStackTrace(System.err);
-            System.err.println("処理を続行できません。");
-            System.exit(1);
-            return null;
+        }finally{
+            this.reader.close();
         }
 
-        MultiPlexer mtplx = new MultiPlexer();
-        mtplx.addWriter(writer);
-        mtplx.addWriter(pipeWriter);
-
-        Runnable task;
-        try{
-            task = new ValidateTask(reader);
-        }catch(SAXException e){
-            e.printStackTrace(System.err);
-            System.err.println("処理を続行できません。");
-            System.exit(1);
-            return null;
-        }
-        Thread th = new Thread(task);
-        th.setDaemon(false);
-        th.start();
-
-        return mtplx;
+        return null;
     }
 
 }

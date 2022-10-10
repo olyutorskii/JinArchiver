@@ -1,32 +1,42 @@
 /*
  * downloader
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import jp.osdn.jindolf.parser.HtmlAdapter;
+import jp.osdn.jindolf.parser.HtmlParseException;
+import jp.osdn.jindolf.parser.HtmlParser;
+import jp.osdn.jindolf.parser.PageType;
+import jp.osdn.jindolf.parser.SeqRange;
+import jp.osdn.jindolf.parser.content.DecodedContent;
 import jp.sourceforge.jindolf.corelib.LandDef;
 import jp.sourceforge.jindolf.corelib.LandState;
 import jp.sourceforge.jindolf.corelib.PeriodType;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.DecodedContent;
-import jp.sourceforge.jindolf.parser.HtmlAdapter;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
-import jp.sourceforge.jindolf.parser.HtmlParser;
-import jp.sourceforge.jindolf.parser.PageType;
-import jp.sourceforge.jindolf.parser.SeqRange;
 
 /**
  * 人狼HTTPサーバ内のリソース情報を展開する。
  */
 public final class HttpAccess{
+
+    /**
+     * 隠しコンストラクタ。
+     */
+    private HttpAccess(){
+        assert false;
+        throw new AssertionError();
+    }
+
 
     /**
      * 日一覧ページ(エピローグの翌日)のURLを得る。
@@ -55,21 +65,22 @@ public final class HttpAccess{
      * @param landDef 国指定
      * @param vid 村番号
      * @return ロード元情報一覧
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      * @throws IOException 入力エラー
      */
     public static List<PeriodResource> loadResourceList(LandDef landDef,
                                                           int vid)
-            throws DecodeException,
+            throws DecodeBreakException,
                    HtmlParseException,
                    IOException {
         URL url = getPeriodListURL(landDef, vid);
 
         Charset charset = landDef.getEncoding();
-        InputStream istream = url.openStream();
-        DecodedContent content = Builder.contentFromStream(charset, istream);
-        istream.close();
+        DecodedContent content;
+        try(InputStream istream = url.openStream()){
+            content = Builder.contentFromStream(charset, istream);
+        }
 
         HtmlParser parser = new HtmlParser();
         PeriodListHandler handler = new PeriodListHandler(landDef, vid);
@@ -81,13 +92,6 @@ public final class HttpAccess{
         List<PeriodResource> result = handler.getResourceList();
 
         return result;
-    }
-
-    /**
-     * 隠しコンストラクタ。
-     */
-    private HttpAccess(){
-        throw new Error();
     }
 
     /**
@@ -123,10 +127,10 @@ public final class HttpAccess{
          */
         public String getURL(PeriodType type, int day){
             String base = this.landDef.getCgiURI().toASCIIString();
-            base += "?vid=" + this.vid;
+            base += "?vid=" + this.vid + "&meslog=";
 
-            if(this.landDef.getLandId().equals("wolfg")){
-                base += "&meslog=";
+            String landId = this.landDef.getLandId();
+            if("wolfg".equals(landId)){
                 String dnum = "000" + (day - 1);
                 dnum = dnum.substring(dnum.length() - 3);
                 switch(type){
@@ -146,7 +150,7 @@ public final class HttpAccess{
                     return null;
                 }
             }else{
-                base += "&meslog=" + this.vid + "_";
+                base += this.vid + "_";
                 switch(type){
                 case PROLOGUE:
                     base += "ready_0";
@@ -183,7 +187,7 @@ public final class HttpAccess{
         @Override
         public void startParse(DecodedContent content)
                 throws HtmlParseException{
-            this.resourceList = new LinkedList<PeriodResource>();
+            this.resourceList = new LinkedList<>();
             this.progressDays = 0;
             this.hasDone = false;
             return;

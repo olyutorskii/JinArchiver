@@ -1,33 +1,41 @@
 /*
  * main entry
  *
+ * License : The MIT License
  * Copyright(c) 2008 olyutorskii
  */
 
 package jp.sourceforge.jindolf.archiver;
 
+import io.bitbucket.olyutorskii.jiocema.DecodeBreakException;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.Validator;
+import jp.osdn.jindolf.parser.HtmlParseException;
 import jp.sourceforge.jindolf.corelib.LandDef;
-import jp.sourceforge.jindolf.parser.DecodeException;
-import jp.sourceforge.jindolf.parser.HtmlParseException;
+import org.xml.sax.SAXException;
 
 /**
  * メインエントリ。
  */
 public final class JinArchiver{
+
+    /** Generator. */
+    public static final String GENERATOR;
 
     /** このClass。 */
     private static final Class<?> SELF_KLASS;
@@ -37,13 +45,15 @@ public final class JinArchiver{
     private static final String TITLE;
     /** バージョン。 */
     private static final String VERSION;
-    /** Generator. */
-    public static final String GENERATOR;
-
-    private static final List<LandDef> LANDDEF_LIST;
 
     /** バージョン定義リソース。 */
     private static final String RES_VERDEF = "resources/version.properties";
+
+    private static final String FORM_FILENAME =
+            "jin_{0}_{1,number,#00000}.xml";
+
+    private static final Charset CS_UTF8 = Charset.forName("UTF-8");
+
 
     static{
         SELF_KLASS   = JinArchiver.class;
@@ -53,18 +63,17 @@ public final class JinArchiver{
         TITLE   = getPackageInfo(verProp, "pkg-title.",   "Unknown");
         VERSION = getPackageInfo(verProp, "pkg-version.", "0");
         GENERATOR = TITLE + " " + VERSION;
-
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-        try{
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            LANDDEF_LIST = LandDef.buildLandDefList(builder);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new ExceptionInInitializerError(e);
-        }
     }
+
+
+    /**
+     * 隠しコンストラクタ。
+     */
+    private JinArchiver(){
+        assert false;
+        throw new AssertionError();
+    }
+
 
     /**
      * リソース上のパッケージ定義プロパティをロードする。
@@ -72,20 +81,14 @@ public final class JinArchiver{
      * @param klass パッケージを構成する任意のクラス
      * @return プロパティ
      */
-    private static Properties loadVersionDefinition(Class klass){
+    private static Properties loadVersionDefinition(Class<?> klass){
         Properties result = new Properties();
 
-        InputStream istream = klass.getResourceAsStream(RES_VERDEF);
-        try{
+        try(InputStream istream = klass.getResourceAsStream(RES_VERDEF)){
             result.load(istream);
         }catch(IOException e){
-            return result;
-        }finally{
-            try{
-                istream.close();
-            }catch(IOException e){
-                return result;
-            }
+            // NOTHING
+            assert true;
         }
 
         return result;
@@ -144,127 +147,28 @@ public final class JinArchiver{
     }
 
     /**
-     * 国IDから国情報を得る。
-     * @param landId 国ID
-     * @return 国情報
-     */
-    public static LandDef getLandDef(String landId){
-        for(LandDef landDef : LANDDEF_LIST){
-            if(landDef.getLandId().equals(landId)) return landDef;
-        }
-        return null;
-    }
-
-    /**
      * ヘルプメッセージ出力。
      */
     private static void helpMessage(){
-        errprintln(
-                "\n" + GENERATOR + " 人狼BBS アーカイブ作成ツール\n\n"
-                +"-h, -help, -?\n\tヘルプメッセージ\n"
-                +"-land 国識別子\n"
-                +"-vid 村番号\n"
-                +"-outdir 出力ディレクトリ\n"
-                +"-stdout\n\t標準出力へ出力\n\n"
-                +"※ -outdir と -stdout は排他指定\n"
-                );
-        StringBuilder landList = new StringBuilder();
-        for(LandDef landDef : LANDDEF_LIST){
-            landList.append(landDef.getLandId()).append(' ');
-        }
-        errprintln("利用可能な国識別子は " + landList + "\n");
-
+        String msg = OptArg.getHelpMessage(GENERATOR);
+        errprintln(msg);
         return;
     }
 
     /**
      * オプション文字列を解析する。
-     * @param args オプション文字列
+     * @param optInfo オプション情報
      */
-    private static void parseOption(String[] args){
-        if(args.length <= 0){
-            helpMessage();
-            exit(0);
-            return;
-        }
+    private static void dumpOut(OptInfo optInfo){
+        String outdir   = optInfo.getOutdir();
+        LandDef landDef = optInfo.getLandDef();
+        int vid         = optInfo.getVid();
 
-        LandDef landDef = null;
-        int vid = -1;
-        String outdir = null;
-        boolean stdout = false;
-
-        for(int pos = 0; pos < args.length; pos++){
-            String arg = args[pos];
-
-            if( ! arg.startsWith("-") ){
-                errprintln("不正なオプションです。 " + arg);
-                exit(1);
-                return;
-            }
-
-            if(arg.equals("-h") || arg.equals("-help") || arg.equals("-?")){
-                helpMessage();
-                exit(0);
-                return;
-            }
-
-            if(arg.equals("-stdout")){
-                stdout = true;
-                outdir = null;
-                continue;
-            }
-
-            if(++pos >= args.length){
-                errprintln(
-                        "オプション " + arg + " に引数がありません。");
-                exit(1);
-                return;
-            }
-
-            String val = args[pos];
-            if(arg.equals("-land")){
-                landDef = getLandDef(val);
-                if(landDef == null){
-                    errprintln("不正な国識別子です。 " + val);
-                    exit(1);
-                    return;
-                }
-            }else if(arg.equals("-vid")){
-                vid = Integer.parseInt(val);
-                if(vid < 0){
-                    errprintln("不正な村番号です。 " + vid);
-                    exit(1);
-                    return;
-                }
-            }else if(arg.equals("-outdir")){
-                outdir = val;
-                stdout = false;
-            }else{
-                errprintln("不正なオプションです。 " + arg);
-                exit(1);
-                return;
-            }
-        }
-
-        if(landDef == null){
-            errprintln(
-                    "-land オプションで国識別子を指定してください。");
-            exit(1);
-            return;
-        }
-
-        if(vid < 0){
-            errprintln(
-                    "-vid オプションで村番号を指定してください。");
-            exit(1);
-            return;
-        }
-
-        if(   (outdir == null && stdout == false)
-           || (outdir != null && stdout == true)  ){
-            errprintln(
-                    "-outdir か -stdout のどちらか一方を指定してください。");
-            exit(1);
+        Validator validator;
+        try{
+            validator = XmlUtils.createValidator();
+        }catch(SAXException e){
+            abortWithException(e, "処理を続行できません。");
             return;
         }
 
@@ -275,41 +179,90 @@ public final class JinArchiver{
             writer = getStdOutWriter();
         }
 
-        writer = ValidateTask.wrapValidator(writer);
-
+        VillageData villageData;
         try{
-            dump(writer, landDef, vid);
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            e.printStackTrace(System.err);
-            errprintln("処理を続行できません。");
-            exit(1);
+            villageData = load(landDef, vid);
+        }catch(IOException e){
+            abortWithException(e);
             return;
+        }catch(DecodeBreakException e){
+            abortWithException(e);
+            return;
+        }catch(HtmlParseException e){
+            abortWithException(e);
+            return;
+        }
+
+        SnifWriter snifWriter = new SnifWriter(writer);
+        Reader reader = snifWriter.getSnifReader();
+
+        writer = new BufferedWriter(snifWriter);
+        reader = new BufferedReader(reader);
+
+        XmlOut xmlOut = new XmlOut(writer);
+        Charset cs = landDef.getEncoding();
+        xmlOut.setSourceCharset(cs);
+
+        ValidateTask valTask = new ValidateTask(reader, validator);
+        DumpXmlTask dumpTask = new DumpXmlTask(villageData, xmlOut);
+
+        ProdCons taskman = new ProdCons(dumpTask, valTask);
+        try{
+            taskman.submit();
+        }catch(InterruptedException e){
+            abortWithException(e);
+        }
+
+        if(taskman.hasError()){
+            Throwable cause = taskman.getCause();
+            String desc = taskman.getErrDescription();
+            abortWithException(cause, desc);
+            assert false;
         }
 
         return;
     }
 
     /**
+     * 例外によるアプリ終了。
+     * @param e 例外
+     */
+    private static void abortWithException(Throwable e){
+        abortWithException(e, "処理を続行できません。");
+        exit(1);
+        return;
+    }
+
+    /**
+     * 例外によるアプリ終了。
+     * @param e 例外
+     * @param desc 詳細テキスト
+     */
+    private static void abortWithException(Throwable e, String desc){
+        e.printStackTrace(System.err);
+        errprintln(desc);
+        exit(1);
+        return;
+    }
+
+    /**
      * 主処理。人狼サーバからXHTMLを読み込み。XMLで出力。
-     * @param writer 出力先
      * @param landDef 国情報
      * @param vid 村番号
+     * @return 村情報
      * @throws IOException 入出力エラー
-     * @throws DecodeException デコードエラー
+     * @throws DecodeBreakException デコードエラー
      * @throws HtmlParseException パースエラー
      */
-    public static void dump(Writer writer, LandDef landDef, int vid)
-            throws IOException, DecodeException, HtmlParseException{
+    public static VillageData load(LandDef landDef, int vid)
+            throws IOException, DecodeBreakException, HtmlParseException{
         List<PeriodResource> resourceList =
                 HttpAccess.loadResourceList(landDef, vid);
-        VillageData village = new VillageData(resourceList);
+        VillageData villageData = new VillageData(resourceList);
 
-        Builder.fillVillageData(village);
-        XmlUtils.dumpVillageData(writer, village);
+        Builder.fillVillageData(villageData);
 
-        return;
+        return villageData;
     }
 
     /**
@@ -333,6 +286,55 @@ public final class JinArchiver{
     }
 
     /**
+     * 出力ディレクトリの検査。
+     * @param outFile 出力ディレクトリ
+     */
+    private static void probeOutDirectory(File outFile){
+        String errMsg = null;
+
+        if( ! outFile.exists() ){
+            errMsg = outFile.toString() + " が存在しません。";
+        }else if( ! outFile.isDirectory() ){
+            errMsg = outFile.toString() + " はディレクトリではありません。";
+        }else if( ! outFile.canWrite() ){
+            errMsg = outFile.toString() + " に書き込めません。";
+        }
+
+        if(errMsg != null){
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+        }
+
+        return;
+    }
+
+    /**
+     * 出力ファイルを生成する。
+     * @param file 出力ファイル
+     */
+    private static void createFile(File file){
+        String errMsg = null;
+
+        try{
+            boolean created = file.createNewFile();
+            if( ! created ){
+                errMsg = file.getName() + " が既に存在します。";
+            }
+        }catch(IOException e){
+            errMsg = file.getName() + " が作成できません。";
+        }
+
+        if(errMsg != null){
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+        }
+
+        return;
+    }
+
+    /**
      * ローカルファイルへの出力先を得る。
      * @param outdir 出力ディレクトリ
      * @param landDef 国情報
@@ -342,63 +344,39 @@ public final class JinArchiver{
     public static Writer getFileWriter(String outdir,
                                          LandDef landDef,
                                          int vid ){
-            File outFile = new File(outdir);
-            if( ! outFile.exists() ){
-                errprintln(
-                        outdir + " が存在しません。");
-                exit(1);
-                return null;
-            }
-            if( ! outFile.isDirectory() ){
-                errprintln(
-                        outdir + " はディレクトリではありません。");
-                exit(1);
-                return null;
-            }
-            if( ! outFile.canWrite() ){
-                errprintln(
-                        outdir + " に書き込めません。");
-                exit(1);
-                return null;
-            }
-            String fname = MessageFormat.format(
-                "jin_{0}_{1,number,#00000}.xml", landDef.getLandId(), vid);
-            File xmlFile = new File(outFile, fname);
-            boolean created;
-            try{
-                created = xmlFile.createNewFile();
-            }catch(IOException e){
-                errprintln(
-                        xmlFile.getName() + " が作成できません。");
-                exit(1);
-                return null;
-            }
-            if( ! created ){
-                errprintln(
-                        fname + " が既に" + outdir + "に存在します。");
-                exit(1);
-                return null;
-            }
-            /* JRE 1.6 only
-            xmlFile.setReadable(true);
-            xmlFile.setWritable(true);
-            xmlFile.setExecutable(false, false);
-            */
-            Writer writer;
-            try{
-                OutputStream ostream;
-                ostream = new FileOutputStream(xmlFile);
-                ostream = new BufferedOutputStream(ostream, 4 * 1024);
-                writer = new OutputStreamWriter(ostream, "UTF-8");
-                writer = new BufferedWriter(writer, 4 * 1024);
-            }catch(IOException e){
-                errprintln(
-                        xmlFile.getName() + " に書き込めません。");
-                exit(1);
-                return null;
-            }
+        File outFile = new File(outdir);
+        probeOutDirectory(outFile);
 
-            return writer;
+        String fname =
+                MessageFormat.format(
+                        FORM_FILENAME, landDef.getLandId(), vid
+                );
+        File xmlFile = new File(outFile, fname);
+
+        createFile(xmlFile);
+
+        /* JRE 1.6 only
+        xmlFile.setReadable(true);
+        xmlFile.setWritable(true);
+        xmlFile.setExecutable(false, false);
+        */
+
+        OutputStream ostream;
+        try{
+            ostream = new FileOutputStream(xmlFile);
+        }catch(FileNotFoundException e){
+            errprintln(xmlFile.getName() + " に書き込めません。");
+            exit(1);
+            return null;
+        }
+
+        ostream = new BufferedOutputStream(ostream, 4 * 1024);
+
+        Writer writer;
+        writer = new OutputStreamWriter(ostream, CS_UTF8);
+        writer = new BufferedWriter(writer, 4 * 1024);
+
+        return writer;
     }
 
     /**
@@ -406,16 +384,29 @@ public final class JinArchiver{
      * @param args 引数
      */
     public static void main(String[] args){
-        parseOption(args);
-        exit(0);
-        return;
-    }
+        OptInfo optInfo = OptInfo.parseOptInfo(args);
 
-    /**
-     * 隠しコンストラクタ。
-     */
-    private JinArchiver(){
-        throw new Error();
+        if(optInfo.isHelp()){
+            helpMessage();
+            exit(0);
+            assert false;
+            return;
+        }
+
+        if(optInfo.hasError()){
+            String errMsg = optInfo.getErrMsg();
+            errprintln(errMsg);
+            exit(1);
+            assert false;
+            return;
+        }
+
+        dumpOut(optInfo);
+
+        exit(0);
+        assert false;
+
+        return;
     }
 
 }

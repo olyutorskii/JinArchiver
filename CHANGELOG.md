@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - ホスティングをOSDNからGitHubへ移行。
 
+### Fixed
+- Maven plugins のJDK20対応
+
+### Build
+- JinParser 2.102.8 に対応。
+- JUnit4からJUnit5へ移行
+
 
 ## [1.504.8] - 2022-10-10
 

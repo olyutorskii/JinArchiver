@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.504.10] - 2023-10-16
+
 ### Changed
 - ホスティングをOSDNからGitHubへ移行。
 
@@ -44,6 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## → CHANGELOG.old (2009-2019) へ続く…
+
+
+[Unreleased]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.10...HEAD
+[1.504.10]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.8...v1.504.10
+[1.504.8]: https://github.com/olyutorskii/JinArchiver/compare/release-1.504.6...v1.504.8
+[1.504.6]: https://github.com/olyutorskii/JinArchiver/compare/release-1.504.4...release-1.504.6
+[1.504.4]: https://github.com/olyutorskii/JinArchiver/compare/release-1.504.2...release-1.504.4
+[1.504.2]: https://github.com/olyutorskii/JinArchiver/releases/tag/release-1.504.2
 
 
 --- EOF ---

@@ -60,7 +60,7 @@ OSDNの可用性に関する問題が長期化しているため、GitHubへと�
 
 
 [JINDOLF]: https://github.com/olyutorskii/Jindolf
-[BBS]: http://ninjinix.com/
+[BBS]: https://ninjinix.com/
 [OSDN]: https://ja.osdn.net/projects/jindolf/scm/git/Jindolf/
 [MIT]: https://opensource.org/licenses/MIT
 

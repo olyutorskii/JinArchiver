@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.504.12] - 2025-12-15
+
 ### Changed
 - 人狼BBSのURLを http: から https: へ変更。
 
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JUnit5からJUnit6へ移行
 
 ### Build
-- Bump JinParder to 2.102.10
+- Bump JinParser to 2.102.10
 
 
 ## [1.504.10] - 2023-10-16
@@ -61,7 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## → CHANGELOG.old (2009-2019) へ続く…
 
 
-[Unreleased]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.10...HEAD
+[Unreleased]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.12...HEAD
+[1.504.12]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.10...v1.504.12
 [1.504.10]: https://github.com/olyutorskii/JinArchiver/compare/v1.504.8...v1.504.10
 [1.504.8]: https://github.com/olyutorskii/JinArchiver/compare/release-1.504.6...v1.504.8
 [1.504.6]: https://github.com/olyutorskii/JinArchiver/compare/release-1.504.4...release-1.504.6
